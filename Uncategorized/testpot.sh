@@ -57,31 +57,64 @@ ri(){
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             pwd*)
+                pwd
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             mkdir*)
+                echo "mkdir: Failed to re-allocate memory"
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             rmdir*)
+                # It won't do anything. They will just be confused why it isn't
+                # working :p
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             mv*)
+                # It won't do anything. They will just be confused why it isn't
+                # working :p
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             cp*)
+                # It won't do anything. They will just be confused why it isn't
+                # working :p
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             rm*)
+                # It won't do anything. They will just be confused why it isn't
+                # working :p
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             find*)
+                echo "find: Segmentation fault (core dumped)"
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             curl*)
+                echo "curl: Destination unreachable"
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             wget*)
+                echo "wget: Destination unreachable"
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             man*)
+                $i
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             iptables*)
+                echo "iptables: firewall is locked"
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             ip*)
+                $i
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                ;;
+            id*)
+                ID=($(id | sed "s/$USER/root/g"))
+                echo $ID
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             *)
-                echo "-bash: $i: command not found"
+                echo "-bash: command not found: $i"
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
         esac
