@@ -15,8 +15,8 @@ readonly filebeat_wazuh_module="${repobaseurl}/filebeat/wazuh-filebeat-0.2.tar.g
 readonly bucket="packages.wazuh.com"
 readonly repository="4.x"
 
-readonly wazuh_major="4.3"
-readonly wazuh_version="4.3.9"
+readonly wazuh_major="4.5"
+readonly wazuh_version="4.5.1"
 readonly filebeat_version="7.10.2"
 readonly wazuh_install_vesion="0.1"
 readonly resources="https://${bucket}/${wazuh_major}"
