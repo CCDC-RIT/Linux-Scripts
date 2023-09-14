@@ -1,8 +1,7 @@
 #!/bin/bash
-# red team backdoor
 cat << 'EOF' > /bin/redd
 #!/bin/bash
-echo "Caught one boys!" >> /var/log/goudapot
+echo "Chandi won't believe this!" >> /var/log/goudapot
 ri(){
     current_directory=$(pwd)
     echo -n "root@$HOSTNAME:$current_directory# "
@@ -113,17 +112,18 @@ ri(){
                 ;;
             id*)
                 ID=($(id | sed "s/$USER/root/g"))
-				echo "uid=0(root) gid=0(root) groups=0(root)"
+			    echo "uid=0(root) gid=0(root) groups=0(root)"
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
 			echo*)
-				echo "$i"
+			    "$i"
 				;;
 			exit*)
-				exit
+                break
 				;;
             *)
                 echo "-bash: command not found: $i"
+                logger "Honey - $i" 
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
         esac
