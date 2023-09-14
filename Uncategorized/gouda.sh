@@ -132,6 +132,5 @@ ri
 EOF
 
 chmod +x /bin/redd
-chmod -r /bin/redd
 touch /var/log/goudapot
 chmod 722 /var/log/goudapot
