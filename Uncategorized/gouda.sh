@@ -116,9 +116,12 @@ ri(){
 								echo "uid=0(root) gid=0(root) groups=0(root)
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
-						echo*)
-								echo "$i"
-								;;
+			echo*)
+				echo "$i"
+				;;
+			exit*)
+				exit
+				;;
             *)
                 echo "-bash: command not found: $i"
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
