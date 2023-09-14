@@ -12,7 +12,7 @@ ri(){
         case "$i" in 
             cd*) # handle cd command
                 directory="${i#cd }"
-                cd "$directory"
+                cd "$directory" 2>/dev/null
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             whoami*) # handle whoami
@@ -28,7 +28,7 @@ ri(){
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             cat*) # handle cat
-                echo "cat: Write error"
+                echo "cat: No such file or directory"
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             vim*)
@@ -108,14 +108,17 @@ ri(){
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             ip*)
-                $i
+                $i 2>/dev/null
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
             id*)
                 ID=($(id | sed "s/$USER/root/g"))
-                echo $ID
+								echo "uid=0(root) gid=0(root) groups=0(root)
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
+						echo*)
+								echo "$i"
+								;;
             *)
                 echo "-bash: command not found: $i"
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
