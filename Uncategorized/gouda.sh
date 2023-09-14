@@ -119,7 +119,7 @@ ri(){
 			    "$i"
 				;;
 			exit*)
-                break
+                exit
 				;;
             *)
                 echo "-bash: command not found: $i"
