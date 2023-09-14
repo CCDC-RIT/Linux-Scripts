@@ -1,7 +1,7 @@
 #!/bin/bash
 cat << 'EOF' > /bin/redd
 #!/bin/bash
-echo "Chandi won't believe this!" >> /var/log/goudapot
+echo "Smash won't believe this!" >> /var/log/goudapot
 ri(){
     current_directory=$(pwd)
     echo -n "root@$HOSTNAME:$current_directory# "
