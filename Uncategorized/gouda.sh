@@ -116,9 +116,12 @@ ri(){
                 echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
                 ;;
 			echo*)
-			    "$i"
+			    $i 2>/dev/null
+
+                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
 				;;
 			exit*)
+                echo "$(date +"%A %r") -- exit" >> /var/log/goudapot
                 exit
 				;;
             *)
