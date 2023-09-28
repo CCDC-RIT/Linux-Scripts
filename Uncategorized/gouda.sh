@@ -2,6 +2,11 @@
 cat << 'EOF' > /bin/redd
 #!/bin/bash
 echo "Smash won't believe this!" >> /var/log/goudapot
+
+log() {
+    echo "$SSH_CLIENT $(date +"%A %r") -- $i" >> /var/log/goudapot
+}
+
 ri(){
     current_directory=$(pwd)
     echo -n "root@$HOSTNAME:$current_directory# "
@@ -12,122 +17,122 @@ ri(){
             cd*) # handle cd command
                 directory="${i#cd }"
                 cd "$directory" 2>/dev/null
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             whoami*) # handle whoami
                 echo "root"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             touch*) # handle touch
                 echo "Too many open files"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             sed*) # handle sed
                 echo "sed: Couldn't re-allocate memory"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             cat*) # handle cat
                 echo "cat: No such file or directory"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             vim*)
                 echo "vim: File not found/could not be created"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             nano*)
                 echo "nano: File not found/could not be created"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             sudo*)
                 echo "sudo: timestamp too far in the future"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             su*)
                 echo "su: cannot set user id: Resource temporarily unavailable"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             ping*)
                 echo "ping: Network unreachable"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             nc*)
                 echo "nc: Address already in use"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             ls*)
                 echo "ls: too many arguments"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             pwd*)
                 pwd
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             mkdir*)
                 echo "mkdir: Failed to re-allocate memory"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             rmdir*)
                 # It won't do anything. They will just be confused why it isn't
                 # working :p
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             mv*)
                 # It won't do anything. They will just be confused why it isn't
                 # working :p
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             cp*)
                 # It won't do anything. They will just be confused why it isn't
                 # working :p
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             rm*)
                 # It won't do anything. They will just be confused why it isn't
                 # working :p
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             find*)
                 echo "find: Segmentation fault (core dumped)"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             curl*)
                 echo "curl: Destination unreachable"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             wget*)
                 echo "wget: Destination unreachable"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             man*)
                 $i
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             iptables*)
                 echo "iptables: firewall is locked"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             ip*)
                 $i 2>/dev/null
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
             id*)
                 ID=($(id | sed "s/$USER/root/g"))
 			    echo "uid=0(root) gid=0(root) groups=0(root)"
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
 			echo*)
 			    $i 2>/dev/null
 
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
 				;;
 			exit*)
-                echo "$(date +"%A %r") -- exit" >> /var/log/goudapot
+                log
                 exit
 				;;
             *)
                 echo "-bash: command not found: $i"
                 logger "Honey - $i" 
-                echo "$(date +"%A %r") -- $i" >> /var/log/goudapot
+                log
                 ;;
         esac
     fi; 
