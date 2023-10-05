@@ -40,7 +40,7 @@ common_pack() {
 
     echo "Installing common packages..."
     sudo apt update
-    sudo apt install git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums -y
+    sudo apt install git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav -y
     echo "Finished installing packages."
 }
 
