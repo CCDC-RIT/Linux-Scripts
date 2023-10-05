@@ -61,6 +61,10 @@ bash_rep() {
     echo "Replaced .bashrc"
 }
 
+reset_environment() {
+    echo "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games\"" > /etc/environment
+}
+
 setup_honeypot() {
 
     echo "Downloading honeypot..."
@@ -85,6 +89,7 @@ setup_honeypot() {
 
 backups
 bash_rep
+reset_environment
 setup_honeypot
 
 # add more here
