@@ -68,8 +68,8 @@ setup_honeypot() {
 
     # Figure out sed command
 
-    sed -i.bak 's|/bin/sh/|/bin/redd|g' /etc/passwd > /etc/passwd
-    sed -i.bak 's|/bin/bash/|/bin/redd|g' /etc/passwd > /etc/passwd
+    sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
+    sed -i.bak 's|/bin/bash|/bin/redd|g' /etc/passwd
 
     echo "Adding new admin user blue..."
     useradd blue -m -G sudo 
