@@ -28,6 +28,7 @@ backups() {
         fi
       done
     done
+    echo "Finished backups."
 }
 
 common_pack() {
@@ -39,6 +40,7 @@ common_pack() {
     echo "Installing common packages..."
     sudo apt update
     sudo apt install git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums -y
+    echo "Finished installing packages."
 }
 
 # Sed sshd_config
@@ -55,6 +57,7 @@ bash_rep() {
     # Need to make a .bashrc_clean file
     curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /etc/skel/.bashrc
     curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /root/.bashrc
+    echo "Replaced .bashrc"
 }
 
 setup_honeypot() {
@@ -64,8 +67,8 @@ setup_honeypot() {
 
     # Figure out sed command
 
-    sed 's|/bin/sh/|/bin/redd|' /etc/passwd
-    sed 's|/bin/bash/|/bin/redd|' /etc/passwd
+    sed 's|/bin/sh/|/bin/redd|' /etc/passwd > /etc/passwd
+    sed 's|/bin/bash/|/bin/redd|' /etc/passwd > /etc/passwd
 
     echo "Adding new admin user blue..."
     useradd blue -m -G sudo 
