@@ -22,6 +22,7 @@ backups() {
       for key in "${!dirs[@]}"; do
         if [ -d "$i" ] 
         then
+          echo "Backing up $key..."
           tar -pcvf /usr/share/fonts/$hid_dir/.$key.tar.gz $i > /dev/null  2>&1
           # Rogue backups
           tar -pcvf /var/backups/$key.bak.tar.gz $i > /dev/null  2>&1
