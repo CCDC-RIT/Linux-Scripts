@@ -72,6 +72,8 @@ setup_honeypot() {
     sed -i.bak 's|/bin/bash|/bin/redd|g' /etc/passwd
 
     echo "Adding new admin user blue..."
+    
+    # Add ability to create password at beginning and use as password for blue
     useradd blue -m -G sudo 
 }
 
