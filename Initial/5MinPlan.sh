@@ -93,8 +93,7 @@ setup_honeypot() {
 
 # main
 
-echo "Please enter password to be added to new user: "
-read PASS
+read -p "Please enter password to be added to new user: " PASS
 
 backups
 bash_rep
