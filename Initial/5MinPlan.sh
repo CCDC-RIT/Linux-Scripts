@@ -49,13 +49,20 @@ common_pack() {
 sed_ssh() {
 
     # Don't know how to do this yet :p
+
+    sed -i.bak 's/.*\(#\)\?Port.*/Port 22/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?LogLevel.*/LogLevel VERBOSE/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?LoginGraceTime.*/LoginGraceTime 2m/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?StrictModes.*/StrictModes yes/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?MaxAuthTries.*/MaxAuthTries 1/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?MaxSessions.*/MaxSessions 2/g' /etc/ssh/sshd_config
     echo "Not finished"
 }
 
 
 bash_rep() {
     echo "Replacing bashrc for new users and root..."
-    # Need to make a .bashrc_clean file
     curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /etc/skel/.bashrc
     curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /root/.bashrc
     echo "Replaced .bashrc"
@@ -69,8 +76,6 @@ setup_honeypot() {
 
     echo "Downloading honeypot..."
     curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Uncategorized/gouda.sh | sh
-
-    # Figure out sed command
 
     sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
     sed -i.bak 's|/bin/bash|/bin/redd|g' /etc/passwd
