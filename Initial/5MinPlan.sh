@@ -57,7 +57,7 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?StrictModes.*/StrictModes yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?MaxAuthTries.*/MaxAuthTries 1/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?MaxSessions.*/MaxSessions 2/g' /etc/ssh/sshd_config
-    sed -i.bak 's/.*\(#\)\?PubKeyAuthentication.*/PubKeyAuthentication no/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?PubkeyAuthentication.*/PubkeyAuthentication no/g' /etc/ssh/sshd_config
     echo "Edited sshd_config"
 }
 
