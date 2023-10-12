@@ -57,7 +57,8 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?StrictModes.*/StrictModes yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?MaxAuthTries.*/MaxAuthTries 1/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?MaxSessions.*/MaxSessions 2/g' /etc/ssh/sshd_config
-    echo "Not finished"
+    sed -i.bak 's/.*\(#\)\?PubKeyAuthentication.*/PubKeyAuthentication no/g' /etc/ssh/sshd_config
+    echo "Edited sshd_config"
 }
 
 
@@ -83,7 +84,7 @@ setup_honeypot() {
     echo "Adding new admin user blue..."
     
     # Add ability to create password at beginning and use as password for blue
-    useradd blue -m -G sudo 
+    useradd -p "$(openssl passwd -6 $PASS)" blue -m -G sudo 
 }
 
 
@@ -92,9 +93,13 @@ setup_honeypot() {
 
 # main
 
+echo "Please enter password to be added to new user: "
+read PASS
+
 backups
 bash_rep
 reset_environment
+sed_ssh
 setup_honeypot
 
 # add more here
