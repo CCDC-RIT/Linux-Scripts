@@ -94,6 +94,7 @@ setup_honeypot() {
 # main
 
 read -s -p "Please enter password to be added to new user: " PASS < /dev/tty
+echo ""
 
 backups
 bash_rep
