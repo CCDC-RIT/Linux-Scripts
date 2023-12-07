@@ -118,12 +118,21 @@ setup_honeypot() {
 
 
 check_ssh_keys() {
+    echo "\n Checking for ssh keys..."
     s="sudo"
     $s cat /root/ssh/sshd_config | grep -i AuthorizedKeysFile
     $s head -n 20 /home/*/.ssh/authorized_keys*
     $s head -n 20 /root/.ssh/authorized_keys*
 }
 
+find_auto_runs() {
+    echo "\n Checking for autoruns..."
+    s="sudo"
+    $s cat /etc/crontab | grep -Ev '#|PATH|SHELL'
+    $s cat /etc/cron.d/* | grep -Ev '#|PATH|SHELL'
+    $s find /var/spool/cron/crontabs/ -printf '%p\n' -exec cat {} \;
+    $s systemctl list-timers
+}
 
 
 # main
