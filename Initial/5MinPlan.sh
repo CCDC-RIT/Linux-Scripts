@@ -117,6 +117,12 @@ setup_honeypot() {
 }
 
 
+check_ssh_keys() {
+    s="sudo"
+    $s cat /root/ssh/sshd_config | grep -i AuthorizedKeysFile
+    $s head -n 20 /home/*/.ssh/authorized_keys*
+    $s head -n 20 /root/.ssh/authorized_keys*
+}
 
 
 
@@ -129,6 +135,7 @@ backups
 bash_rep
 reset_environment
 sed_ssh
+check_ssh_keys
 setup_honeypot
 
 # add more here
