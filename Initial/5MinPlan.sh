@@ -32,18 +32,6 @@ backups() {
     echo "Finished backups."
 }
 
-common_pack() {
-    # Install common packages
-    #
-    # [  ] Needs to be able to fix sources.list
-    # [  ] Prompt user for distro
-
-    echo "Installing common packages..."
-    sudo apt update
-    sudo apt install git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav -y
-    echo "Finished installing packages."
-}
-
 # Sed sshd_config
 
 sed_ssh() {
@@ -90,32 +78,9 @@ sed_ssh() {
     echo "Edited sshd_config"
 }
 
-
-bash_rep() {
-    echo "Replacing bashrc for new users and root..."
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /etc/skel/.bashrc
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /root/.bashrc
-    echo "Replaced .bashrc"
-}
-
 reset_environment() {
     echo "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games\"" > /etc/environment
 }
-
-setup_honeypot() {
-
-    echo "Downloading honeypot..."
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Uncategorized/gouda.sh | sh
-
-    sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
-    sed -i.bak 's|/bin/bash|/bin/redd|g' /etc/passwd
-
-    echo "Adding new admin user blue..."
-    
-    # Add ability to create password at beginning and use as password for blue
-    useradd -p "$(openssl passwd -6 $PASS)" blue -m -G sudo 
-}
-
 
 check_ssh_keys() {
     echo "\n Checking for ssh keys..."
@@ -137,15 +102,10 @@ find_auto_runs() {
 
 # main
 
-read -s -p "Please enter password to be added to new user: " PASS < /dev/tty
-echo ""
-
 backups
-bash_rep
 reset_environment
 sed_ssh
 check_ssh_keys
-setup_honeypot
 
 # add more here
 
