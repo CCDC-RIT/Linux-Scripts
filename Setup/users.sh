@@ -2,37 +2,31 @@
 # by: Justin Huang (jznn)
 
 # Objective: provides option for user to change passwords and disable users
-# Suggestion: do not use change all and disable all functionalities, as there should always be exceptions that should not be disabled or changed (ex: blue/white team users)
-# don't ask why i added the functionality if i'm never going to use it
+# Pre-condition: a file called users.txt exists in the same directory, with a list of users whose information should be changed (can be obtained by running getUsers.sh)
 
-# TODO: add RHEL IDM functionality, add exception for white team user and other scoring user (potentially just omit from selected user list)
+# TODO: add RHEL IDM functionality
 # TODO: test run
 
-# grab list of users
-user_list=$(grep "bash" /etc/passwd | cut -d':' -f1); # only counts users with /bin/bash as their login shell, can potentially be changed later to do all users
-# note: i don't think it'd be a good idea to have it include ALL users, as changing stuff for system users and scoring users could be catastrophic
-
 # print list of users to stdout
-list_users(){
+list_users() {
     echo "Current Users: "
-    for user in $user_list
-    do
-        echo $user
-    done
+    while IFS= read -r user; do
+        echo "$user"
+    done < users.txt
 }
 
-# change passwords for all user accounts
+# change passwords for all user accounts in users.txt 
 change_all()
 {   
     # prompt for password to be used
     read -s -p "Please enter password to be added to new user: " PASS < /dev/tty
 	echo "setting passwords"
-	for user in $user_list; do
+	while IFS= read -r user; do
 		passwd -q -x 85 $user > /dev/null; # password aging controls because why not
 		passwd -q -n 15 $user > /dev/null;
 		echo $user:$PASS | chpasswd; 
 		chage --maxdays 15 --mindays 6 --warndays 7 --inactive 5 $user;
-	done;
+	done < users.txt
 }
 
 # change passwords for certain users
@@ -56,12 +50,13 @@ change_passwords(){
     done < "$user_file"
 }
 
-# disable all users and change shell
+# disable all users in users.txt and change shell
 disable_all() {
-    for user in $user_list; do
+    while IFS= read -r user; do
+        usermod --expiredate 1 $user # Set the expiration date to yesterday 
 		passwd -l $user; # disable password login
         chsh -s /bin/redd $user # changing to honeypot shell
-	done;
+	done < users.txt
 }
 
 disable_users(){
@@ -72,18 +67,20 @@ disable_users(){
     fi
     while IFS= read -r user; do
         if [ -n "$user" ]; then
-            passwd -l $user; # disable password login
-            chsh -s /bin/redd $user # changing to honeypot shell
+            usermod --expiredate 1 $user # Set the expiration date to yesterday 
+            passwd -l "$user"; # disable password login
+            chsh -s /bin/redd "$user" # changing to honeypot shell
         fi
+    done < "$user_file"
 }
 
 # function to display options for user input
 display_options() {
     echo "Menu:"
-    echo "1. List all users, including system users, in /etc/passwd"
-    echo "2. Change passwords for all users"
+    echo "1. List all users with valid shells in /etc/passwd"
+    echo "2. Change passwords for all users in list"
     echo "3. Change password for certain users (provide file)"
-    echo "4. Disable all users and apply proper user properties"
+    echo "4. Disable all users in list and apply proper user properties"
     echo "5. Disable certain users (provide file) and apply proper user properties"
     echo "6. Exit"
 }
