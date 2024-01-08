@@ -7,10 +7,11 @@
 # Usage:
 # Note - Tested on Debian 12 and Ubuntu 20.04
 # 1. Install curl via "sudo apt install curl"
-# 2. Obtain this script via "curl github.com/CCDC-RIT/Linux-Scripts/downloads.sh"
+# 2. Obtain this script via "curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/downloads.sh > downloader.sh"
 # 3. Run it via "sudo sh downloads" or your equivalent bash execution method
 #      If you get an error like "useradd command not found", start a superuser session with "su -l"
-# 4. The script will then automatically delete itself. The installed scripts are located in /home/blue/Linux-Scripts
+# 4. If you get configuration popups, the defaults should likely work fine.
+# 5. The script will then automatically delete itself. The installed scripts are located in /home/blue/Linux-Scripts
 
 # Tasks/Questions:
 # Where do we download these files to? - blue user home directory in scripts folder
@@ -49,25 +50,44 @@ bash_rep() {
 }
 
 setup_honeypot() {
-    # Install our own shell replacement for all users that just traps them into a honeypot.
+    # Set up our own shell replacement for all users that just traps them into a honeypot.
     # All users should also have a secure password and etc for security...
     # If a user needs to use shell for legit reasons, you need to manually reset their shell.
 
     echo "Downloading honeypot..."
+    # Download and run the setup script
     curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Uncategorized/gouda.sh | sh
 
-    sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
-    sed -i.bak 's|/bin/bash|/bin/redd|g' /etc/passwd
+    # Don't actually install it into /etc/passwd as user hardening script will do that
+    #sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
+    #sed -i.bak 's|/bin/bash|/bin/redd|g' /etc/passwd
+    echo "Honeypot prepped and placed in /bin/redd"
+}
 
-    if  ! [ -z "$NAME" ];
+add_admin_user() {
+    # Prompt user for username and password for new admin user
+    echo "If you do not wish to make a new blue team admin user, leave it blank and proceed. Recommended name: 'blue'"
+    read -p "Please enter name of new blue team admin user (without spaces): " NAME < /dev/tty
+
+    # if given username is not empty, check if name already exists and then securely prompt for a password
+    if ! [ -z "$NAME" ];
     then
+        # if given username is already in use, exit
+        if [ `id -u $NAME 2>/dev/null || echo -1` -ge 0 ]; # i tried a morbillion ways to detect this and this is the only one that works for some reason
+        then
+            echo 'A user with the provided admin username already exists, re-run this script and pick another one!'
+            exit
+        fi
+
+        read -s -p "Please enter password to be added to new admin user $NAME: " PASS < /dev/tty
+        echo "" #need to start a new line
+
         # Add ability to create password at beginning and use as password for blue
         echo "Adding new admin user $NAME..."
         #useradd may error in debian as not found. to fix, exit the root session and begin a new one with su -l
         useradd -p "$(openssl passwd -6 $PASS)" $NAME -m -G sudo
     else
-        echo "Not adding a blue team admin user due to configuration options suppressing this functionality!"
-        echo "As you did not create a blue team user, make sure not to get caught by the auto-configured honeypot that has been applied to all accounts!"
+        echo "Not adding an admin user due to configuration options suppressing this functionality!"
     fi
 }
 
@@ -77,7 +97,7 @@ fetch_all_scripts() {
     if ! [ -z "$NAME" ];
     then
         # If we did make an admin user, then toss the scripts into their home
-        git clone https://github.com/CCDC-RIT/Linux-Scripts/ /home/$NAME
+        git clone https://github.com/CCDC-RIT/Linux-Scripts/ /home/$NAME/Linux-Scripts
         echo "Scripts have been downloaded to /home/$NAME/Linux-Scripts"
     else
         # If we didn't make an admin user, then toss the scripts into the current directory
@@ -99,28 +119,11 @@ finish() {
 
 # Main
 
-# Prompt user for username and password for new admin user
-echo "If you do not wish to make a new blue team admin user, leave it blank and proceed."
-read -p "Please enter name of new blue team admin user (without spaces): " NAME < /dev/tty
-
-# if given username is not empty, check if name already exists and then securely prompt for a password
-if ! [ -z "$NAME" ];
-then
-    # if given username is already in use, exit
-    if [ `id -u $NAME 2>/dev/null || echo -1` -ge 0 ]; # i tried a morbillion ways to detect this and this is the only one that works for some reason
-    then
-        echo 'A user with the provided admin username already exists, re-run this script and pick another one!'
-        exit
-    fi
-
-    read -s -p "Please enter password to be added to new admin user $NAME: " PASS < /dev/tty
-    echo "" #need to start a new line
-fi
-
 # Run the above setup functions
 common_pack
 bash_rep
 setup_honeypot
+add_admin_user
 fetch_all_scripts
 
 echo "Downloads script complete!"
