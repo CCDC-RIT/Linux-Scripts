@@ -34,7 +34,7 @@ change_passwords(){
     read -p "Provide the name of a file containing the usernames of each user whose password you want to change, one per line" user_file
     if [ ! -f "$user_file" ]; then
         echo "Error: File not found."
-    return 1
+        return 1
     fi
     # prompt for password to be used
     read -s -p "Please enter password to be added to new user: " PASS < /dev/tty
@@ -63,7 +63,7 @@ disable_users(){
     read -p "Provide the name of a file containing the usernames of each user who should be disabled, one per line" user_file
     if [ ! -f "$user_file" ]; then
         echo "Error: File not found."
-    return 1
+        return 1
     fi
     while IFS= read -r user; do
         if [ -n "$user" ]; then
@@ -116,6 +116,6 @@ handle_input() {
 
 # Main loop
 while true; do
-    display_menu
+    display_options
     handle_input
 done
