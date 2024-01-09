@@ -5,7 +5,7 @@
 # Also install some common packages and shell stuff
 
 # Usage:
-# Note - Tested on Debian 12 and Ubuntu 20.04
+# Note - Tested on Debian 12 and Ubuntu 22.04.03
 # 1. Install curl via "sudo apt install curl"
 # 2. Obtain this script via "curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/downloads.sh > downloader.sh"
 # 3. Run it via "sudo sh downloads" or your equivalent bash execution method
@@ -174,7 +174,6 @@ common_pack() {
         #sudo slapt-get update #Not a thing for slapt-get
         sudo slapt-get --install $COMMON_PACKAGES
     else
-        # TODO this stuff isn't tested...
         echo "Unsupported or unknown OS detected: $OS"
         read -p "Please enter the command to update the package manager's list of available packages (such as 'apt update'): " PKG_UPDATE < /dev/tty
         read -p "If applicable, add any arguments you wish to add to the update command: " PKG_UPDATE_ARGS < /dev/tty
