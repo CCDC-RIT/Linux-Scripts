@@ -1,9 +1,11 @@
 #!/bin/bash
-##Hal Williams
-#ima try and make this better based on our insperation, credit @d_tranman
-
+#Hal Williams
+#Based on a similar inventory script by another team : credit @d_tranman
 #WIP
-#todo, SUID, worldwritiable, sudogroup, services, more?, print everything, expand the distributions detected
+#todo: expand the distributions detected
+#Notes Need to be Sudo
+
+exec 2>/dev/null
 
 #OS variable initialization
 DEBIAN=false
@@ -115,3 +117,46 @@ PORTS=$( netstat -tlpn | tail -n +3 | awk '{print $1 " " $4 " " $6 " " $7}' | co
 
 echo -e "\nListening Ports: $PORTS"
 
+#Services
+#lsof wont be able to show the port(s) if this isnt run as sudo
+checkService(){
+	serviceList=$( systemctl --type=service | grep active | awk '{print $1}' || service --status-all | grep -E '(+|is running)' )
+	service=$1
+
+	if echo "$serviceList" | grep -qi "$service"; then
+		echo -e "$service is on this machine"
+		PID=$(systemctl show -p MainPID --value $service)
+		echo -e "$service is listening on $(lsof -i -P -n -a -p "$PID" | grep LISTEN | awk '{print $9}' | awk -F ":" '{print $NF}' | sort -u )"
+		return 1
+	fi
+	return 0
+}
+
+checkService 'ssh'; SSH=$?
+checkService 'apache2'; APACHE=$?
+checkService 'nginx'; NGINX=$?
+checkService 'docker'; DOCKER=$?
+checkService 'ftp'; FTP=$?
+checkService 'pure-ftpd'; PUREFTPD=$?
+checkService 'proftpd'; PROFTPD=$?
+checkService 'vsftpd'; VSFTPD=$?
+checkService 'tftpd'; TFTPD=$?
+checkService 'atftpd'; ATFTPD=$?
+checkService 'mysql'; MYSQL=$?
+checkService 'mariadb'; MARIADB=$?
+checkService 'postgres'; POSTGRES=$?
+checkService 'httpd'; HTTPD=$?
+checkService 'php'; PHP=$?
+checkService 'python'; PYTHON=$?
+checkService 'xinetd'; XINETD=$?
+checkService 'inetd'; INETD=$?
+checkService 'smbd'; SMBD=$?
+checkService 'nmbd'; NMBD=$?
+checkService 'ypbind'; YPBIND=$?
+checkService 'rshd'; RSHD=$?
+checkService 'rexecd'; REXECD=$?
+checkService 'rlogin'; RLOGIN=$?
+checkService 'telnet'; TELNET=$?
+checkService 'squid'; SQUID=$?
+checkService 'dropbear'; DROPBEAR=$?
+checkService 'cockpit'; COCKPIT=$?
