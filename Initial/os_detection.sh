@@ -1,21 +1,11 @@
-#######################################################################
+##############################################################################
 # Identifies the current OS and writes it to a file for later reference
-# Written by Guac0 using code by Hal Williams
-#######################################################################
+# See notes in os_detection_template.sh for how to reference this in your code
+# Written by Guac0 adapting original code by Hal Williams
+##############################################################################
 
-# To use these stored variable names, add the following:
-# source PATH/TO/os.txt
-# or (alternate syntax): . PATH/TO/os.txt
-# Then, you will have an all-caps variable name of each supported OS with a boolean value of whether it was detected or not
-    # Such as $DEBIAN=true
-# Additionally, $OS_NAME gives a string representation of the most specific OS/Distribution that was detected
-    # Such as $OS_NAME=debian
-# Note that this will run os.txt, so be careful if red team modifies it!
-    # It's set to read only
-
-# Issues
-# Are these problematic variable names?
-# I suspect that the initialization of all of them to false links them in some way, causing them all to be set to true when 1 is. will fix later
+# Issues:
+# Are these problematic variable names? i.e. DEBIAN might be an easily-confused variable
 
 #OS variable storage
 osArray=(DEBIAN REDHAT ALPINE SLACK AMZ)
@@ -33,8 +23,7 @@ osArray+=(RHEL)
 
 #initialize each OS variable as false
 for OS in "${osArray[@]}"; do
-    declare -n "${OS}"=false
-    echo "${OS}"
+    declare "${OS}"=false
 done
 OS_NAME=unknown
 
@@ -89,7 +78,7 @@ elif [ -e /etc/system-release ] ; then
     AMZ_INIT
 fi
 
-echo "OS detected: ${OS_NAME}"
+echo "Most specific OS/distribution detected: ${OS_NAME}"
 echo "Writing results to os.txt"
 
 # Write results to file
@@ -99,7 +88,7 @@ chmod 644 os.txt #readable and writeable
 echo "OS_NAME=$OS_NAME" >> os.txt
 for OS in ${osArray[@]}; do
     echo "$OS=${!OS}" >> os.txt
-    echo "$OS=${!OS}"
+    #echo "$OS=${!OS}" # show user all the os vars and their value. mostly for debug
 done
 
 # Make os file read-only for all users to attempt to prevent injection of malicious code,
