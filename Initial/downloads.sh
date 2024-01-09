@@ -18,7 +18,7 @@
 # Migrate downloading and installing honeypot - done
 # Download and install packages - done (well, the original ones given to me at least)
 # General move from 5MinPlan.sh to this - done
-# Add inter-OS dependency
+# Add inter-OS interdependency - done
 
 # check for root for installs and exit if not found
 if  [ "$EUID" -ne 0 ];
@@ -27,16 +27,184 @@ then
     exit
 fi
 
+
+#################################################
+# Check what OS we're running on
+# Uses logic from inventory.sh by Hal Williams
+#################################################
+
+#OS variable initialization
+DEBIAN=false
+REDHAT=false
+ALPINE=false
+SLACK=false
+AMZ=false
+
+#Debian distributions
+UBUNTU=false
+#MINT=false
+#ELEMENTARY=false
+#KALI=false
+#RASPBIAN=false
+#PROMOXVE=false
+#ANTIX=false
+
+#Red Hat Distributions
+RHEL=false
+#CENTOS=false
+#FEDORA=false
+#ORACLE=false
+#ROCKY=false
+#ALMA=false
+
+#Alpine Distributions
+#ADELIE=false
+#WSL=false
+
+#sets OS and distribution, distribution needs to be tested on a instance of each
+DEBIAN() {
+    DEBIAN=true
+    OS=debian
+    #Determine distribution
+    if grep -qi Ubuntu /etc/os-release ; then
+        UBUNTU=true
+        OS=ubuntu
+    fi
+    #add more for each debian distro later
+}
+REDHAT() {
+    REDHAT=true
+    #Determine distribution
+    OS=redhat
+    if [ -e /etc/redhat-release ] ; then
+        RHEL=true
+        OS=rhel
+    fi
+}
+ALPINE() {
+    ALPINE=true
+    OS=alpine
+    #Determine distribution
+}
+SLACK() {
+    SLACK=true
+    OS=slack
+    #Determine distribution
+}
+AMZ() {
+    AMZ=true
+    OS=amazon_linux
+}
+
+#Determines OS
+DEBIAN=false
+UBUNTU=false
+REDHAT=false
+ALPINE=false
+SLACK=false
+AMZ=false
+RHEL=false
+if [ -e /etc/debian_version ] ; then
+    DEBIAN
+elif [ -e /etc/redhat-release ] ; then
+    REDHAT
+elif [ -e /etc/alpine-release ] ; then
+    ALPINE
+elif [ -e /etc/slackware-version ] ; then 
+    SLACK
+#This one def needs tested but I dont have access to amazon linux till i can get back to school.
+elif [ -e /etc/system-release ] ; then
+    AMZ
+else
+    echo "Downloader script cannot determine what Operating System this machine is running on!"
+    #echo "The script will now exit"
+    OS=unknown
+    #exit
+fi
+
+#################################################
+# End OS checking
+# Begin main functions declaration
+#################################################
+
+unsupported_os() {
+    # Currently unused
+
+    echo "The downloader script has successfully identified the OS as $OS, but this OS is not supported."
+    echo "The downloader script will now exit."
+    exit
+}
+
 common_pack() {
     # Install common packages
     #
-    # [  ] Needs to be able to fix sources.list (red team can point to their own malicious sources)
-    # [  ] Prompt user for distro (apt update only works on debian-based)
-    # curl may be pre-installed in order to fetch this installer script in the first place...
+    # TODO Needs to be able to fix sources.list (red team can point to their own malicious sources)
+    # TODO paranoia - what if some of these are already installed with bad/malicious configs? I don't think they get overwritten with the current settings...
 
     echo "Installing common packages..."
-    sudo apt update
-    sudo apt install git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav snoopy auditd -y #-y for say yes to everything
+    # curl may be pre-installed in order to fetch this installer script in the first place...
+    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav snoopy auditd"
+    
+    # Change package manager depending on OS
+    if $DEBIAN || $UBUNTU ; then
+        echo "Detected compatible OS: $OS"
+        echo "Using apt install to install common packages."
+
+        sudo apt update
+        sudo apt install $COMMON_PACKAGES -y #-y for say yes to everything
+    elif $REDHAT || $RHEL || $AMZ ; then 
+        # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
+        # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
+        # https://access.redhat.com/sites/default/files/attachments/rh_yum_cheatsheet_1214_jcs_print-1.pdf
+        echo "Detected compatible OS: $OS"
+        echo "Using yum to install common packages."
+
+        sudo yum check-update
+        sudo yum install $COMMON_PACKAGES -y
+    elif $ALPINE ; then 
+        echo "Detected compatible OS: $OS"
+        echo "Using apk to install common packages."
+
+        sudo apk update
+        sudo apk add $COMMON_PACKAGES #apk automatically has equivalent -y functionality
+    elif $SLACK ; then 
+        echo "Detected compatible OS: $OS"
+        echo "Using slapt-get to install common packages."
+
+        #sudo slapt-get update #Not a thing for slapt-get
+        sudo slapt-get --install $COMMON_PACKAGES
+    else
+        # TODO this stuff isn't tested...
+        echo "Unsupported or unknown OS detected: $OS"
+        read -p "Please enter the command to update the package manager's list of available packages (such as 'apt update'): " PKG_UPDATE < /dev/tty
+        read -p "If applicable, add any arguments you wish to add to the update command: " PKG_UPDATE_ARGS < /dev/tty
+        read -p "Please enter the command to install a new package (such as 'apt install'): " PKG_INSTALL < /dev/tty
+        read -p "If applicable, add any arguments you wish to add to the install command (such as '-y'): " PKG_INSTALL_ARGS < /dev/tty
+        #Only execute the commands if they're not empty
+        if ! [ -z "$PKG_UPDATE" ];
+        then
+            #not empty
+            if ! [ -z "$PKG_UPDATE_ARGS" ];
+            then
+                #not empty
+                sudo $PKG_UPDATE $PKG_UPDATE_ARGS
+            else
+                sudo $PKG_UPDATE
+            fi
+        fi
+        if ! [ -z "$PKG_INSTALL" ];
+        then
+            #not empty
+            if ! [ -z "$PKG_INSTALL_ARGS" ];
+            then
+                #not empty
+                sudo $PKG_INSTALL $COMMON_PACKAGES $PKG_INSTALL_ARGS
+            else
+                sudo $PKG_INSTALL $COMMON_PACKAGE
+            fi
+        fi
+    fi
+
     echo "Finished installing packages."
 }
 
@@ -65,6 +233,10 @@ setup_honeypot() {
 }
 
 add_admin_user() {
+    # Optionally adds a new blue team admin user
+    # Call this BEFORE fetch_all_scripts()
+    # TODO is this password creation method secure enough?
+
     # Prompt user for username and password for new admin user
     echo "If you do not wish to make a new blue team admin user, leave it blank and proceed. Recommended name: 'blue'"
     read -p "Please enter name of new blue team admin user (without spaces): " NAME < /dev/tty
@@ -94,6 +266,7 @@ add_admin_user() {
 fetch_all_scripts() {
     # Just download all the scripts to the home folder of the blue team users
     # Call this AFTER blue user is set up! (setup_honeypot)
+    # If we didn't make an admin user, just download to the current directory
     if ! [ -z "$NAME" ];
     then
         # If we did make an admin user, then toss the scripts into their home
@@ -117,9 +290,10 @@ finish() {
 
 
 
-# Main
+#################################################
+# Main code
+#################################################
 
-# Run the above setup functions
 common_pack
 bash_rep
 setup_honeypot
