@@ -37,8 +37,9 @@ RHEL=false
 DEBIAN(){
     DEBIAN=true
     #Determine distribution
-    if $(cat /etc/os-release | grep -qi Ubuntu) ; then
+    if grep -qi Ubuntu /etc/os-release ; then
         UBUNTU=true
+    fi
     #add more for each debian distro later
 }
 REDHAT(){
@@ -46,6 +47,7 @@ REDHAT(){
     #Determine distribution
     if [ -e /etc/redhat-release ] ; then
         RHEL=true
+    fi
 }
 ALPINE(){
     ALPINE=true
@@ -66,7 +68,7 @@ elif [ -e /etc/redhat-release ] ; then
     REDHAT
 elif [ -e /etc/alpine-release ] ; then
     ALPINE
-elif [ -e /etc/slackware-version ] || (cat /etc/os-release | grep -qi slackware ) ; then 
+elif [ -e /etc/slackware-version ] ; then 
     SLACK
 #This one def needs tested but I dont have access to amazon linux till i can get back to school.
 elif [ -e /etc/system-release ] ; then
@@ -111,5 +113,5 @@ echo -e "World Writable Files: $WORLDWRITABLE\n"
 #Listening ports
 PORTS=$( netstat -tlpn | tail -n +3 | awk '{print $1 " " $4 " " $6 " " $7}' | column -t || ss -blunt -p | tail -n +2 | awk '{print $1 " " $5 " " $7}' | column -t )
 
-echo -e "/nListening Ports: $PORTS/n"
+echo -e "\nListening Ports: $PORTS\n"
 
