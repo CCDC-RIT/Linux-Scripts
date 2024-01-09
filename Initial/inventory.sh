@@ -100,18 +100,18 @@ WORLDWRITABLE=$( find /usr /bin/ /sbin /var/www/ lib -perm -o=w -type f -exec ls
 echo -e "Inventory\n"
 
 echo -e "\nHost Info\n"
-echo -e "Hostname: $HOSTNAME\n"
-echo -e "OS: $OS\n"
-echo -e "IP Addresses/Interfaces: $IP\n"
-echo -e "Users: $USERS\n"
-echo -e "Sudoers: $SUDOERS\n"
-echo -e "Sudo Group Users: $SUDOGROUP\n"
-echo -e "SUIDS: $SUIDS\n"
-echo -e "World Writable Files: $WORLDWRITABLE\n"
+echo -e "Hostname: $HOSTNAME"
+echo -e "OS: $OS"
+echo -e "IP Addresses/Interfaces: $IP"
+echo -e "Users: $USERS"
+echo -e "Sudoers: $SUDOERS"
+echo -e "Sudo Group Users: $SUDOGROUP"
+echo -e "SUIDS: $SUIDS"
+echo -e "World Writable Files: $WORLDWRITABLE"
 
 #this might go to the services script that ima make tomorrow
 #Listening ports
 PORTS=$( netstat -tlpn | tail -n +3 | awk '{print $1 " " $4 " " $6 " " $7}' | column -t || ss -blunt -p | tail -n +2 | awk '{print $1 " " $5 " " $7}' | column -t )
 
-echo -e "\nListening Ports: $PORTS\n"
+echo -e "\nListening Ports: $PORTS"
 
