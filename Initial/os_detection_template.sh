@@ -5,11 +5,13 @@
 ##############################################################################
 
 # Import the OS variables
+# Needs os_detection.sh to run first
 PATH_TO_OS_RESULTS_FILE="./os.txt"
 if [ -f $PATH_TO_OS_RESULTS_FILE ] ; then
     source $PATH_TO_OS_RESULTS_FILE
 else
-    echo "Operating System information file (as produced by os_detection.sh) not found!"
+    echo "Operating System information file (as produced by os_detection.sh) not found! Exiting..."
+    exit
 fi
 
 # At this point, the OS variables are set up.

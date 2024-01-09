@@ -7,74 +7,14 @@
 
 exec 2>/dev/null
 
-#OS variable initialization
-DEBIAN=false
-REDHAT=false
-ALPINE=false
-SLACK=false
-AMZ=false
-
-#Debian distributions
-UBUNTU=false
-#MINT=false
-#ELEMENTARY=false
-#KALI=false
-#RASPBIAN=false
-#PROMOXVE=false
-#ANTIX=false
-
-#Red Hat Distributions
-RHEL=false
-#CENTOS=false
-#FEDORA=false
-#ORACLE=false
-#ROCKY=false
-#ALMA=false
-
-#Alpine Distributions
-#ADELIE=false
-#WSL=false
-
-#sets OS and distribution, distribution needs to be tested on a instance of each
-DEBIAN(){
-    DEBIAN=true
-    #Determine distribution
-    if grep -qi Ubuntu /etc/os-release ; then
-        UBUNTU=true
-    fi
-    #add more for each debian distro later
-}
-REDHAT(){
-    REDHAT=true
-    #Determine distribution
-    if [ -e /etc/redhat-release ] ; then
-        RHEL=true
-    fi
-}
-ALPINE(){
-    ALPINE=true
-    #Determine distribution
-}
-SLACK(){
-    SLACK=true
-    #Determine distribution
-}
-AMZ(){
-    AMZ=true
-}
-
-#Determines OS
-if [ -e /etc/debian_version ] ; then
-    DEBIAN
-elif [ -e /etc/redhat-release ] ; then
-    REDHAT
-elif [ -e /etc/alpine-release ] ; then
-    ALPINE
-elif [ -e /etc/slackware-version ] ; then 
-    SLACK
-#This one def needs tested but I dont have access to amazon linux till i can get back to school.
-elif [ -e /etc/system-release ] ; then
-    AMZ
+# Import the OS variables
+# Needs os_detection.sh to run first
+PATH_TO_OS_RESULTS_FILE="./os.txt"
+if [ -f $PATH_TO_OS_RESULTS_FILE ] ; then
+    source $PATH_TO_OS_RESULTS_FILE
+else
+    echo "Operating System information file (as produced by os_detection.sh) not found! Exiting..."
+    exit
 fi
 
 #Host info gathering

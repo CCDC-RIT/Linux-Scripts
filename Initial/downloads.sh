@@ -27,103 +27,29 @@ then
     exit
 fi
 
+setup_os_detection() {
+    # Import and run the os detector script in the current directory
+    # Run this first before stuff that needs to know the OS, like common_pack()
 
-#################################################
-# Check what OS we're running on
-# Uses logic from inventory.sh by Hal Williams
-#################################################
+    echo "Importing OS detection method..."
+    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/os_detection.sh > os_detection.sh
+    bash os_detection.sh
 
-#OS variable initialization
-DEBIAN=false
-REDHAT=false
-ALPINE=false
-SLACK=false
-AMZ=false
-
-#Debian distributions
-UBUNTU=false
-#MINT=false
-#ELEMENTARY=false
-#KALI=false
-#RASPBIAN=false
-#PROMOXVE=false
-#ANTIX=false
-
-#Red Hat Distributions
-RHEL=false
-#CENTOS=false
-#FEDORA=false
-#ORACLE=false
-#ROCKY=false
-#ALMA=false
-
-#Alpine Distributions
-#ADELIE=false
-#WSL=false
-
-#sets OS and distribution, distribution needs to be tested on a instance of each
-DEBIAN() {
-    DEBIAN=true
-    OS=debian
-    #Determine distribution
-    if grep -qi Ubuntu /etc/os-release ; then
-        UBUNTU=true
-        OS=ubuntu
+    # Import results
+    PATH_TO_OS_RESULTS_FILE="./os.txt"
+    if [ -f $PATH_TO_OS_RESULTS_FILE ] ; then
+        source $PATH_TO_OS_RESULTS_FILE
+    else
+        echo "Operating System information file (as produced by os_detection.sh) not found! Exiting..."
+        exit
     fi
-    #add more for each debian distro later
-}
-REDHAT() {
-    REDHAT=true
-    #Determine distribution
-    OS=redhat
-    if [ -e /etc/redhat-release ] ; then
-        RHEL=true
-        OS=rhel
-    fi
-}
-ALPINE() {
-    ALPINE=true
-    OS=alpine
-    #Determine distribution
-}
-SLACK() {
-    SLACK=true
-    OS=slack
-    #Determine distribution
-}
-AMZ() {
-    AMZ=true
-    OS=amazon_linux
-}
 
-#Determines OS
-if [ -e /etc/debian_version ] ; then
-    DEBIAN
-elif [ -e /etc/redhat-release ] ; then
-    REDHAT
-elif [ -e /etc/alpine-release ] ; then
-    ALPINE
-elif [ -e /etc/slackware-version ] ; then 
-    SLACK
-#This one def needs tested but I dont have access to amazon linux till i can get back to school.
-elif [ -e /etc/system-release ] ; then
-    AMZ
-else
-    echo "Downloader script cannot determine what Operating System this machine is running on!"
-    #echo "The script will now exit"
-    OS=unknown
-    #exit
-fi
-
-#################################################
-# End OS checking
-# Begin main functions declaration
-#################################################
+    echo "OS detection completed."
+}
 
 unsupported_os() {
     # Currently unused
-
-    echo "The downloader script has successfully identified the OS as $OS, but this OS is not supported."
+    echo "The downloader script has successfully identified the OS as $OS_NAME, but this OS is not supported."
     echo "The downloader script will now exit."
     exit
 }
@@ -140,7 +66,7 @@ common_pack() {
     
     # Change package manager depending on OS
     if $DEBIAN || $UBUNTU ; then
-        echo "Detected compatible OS: $OS"
+        echo "Detected compatible OS: $OS_NAME"
         echo "Using apt install to install common packages."
 
         sudo apt update
@@ -149,25 +75,25 @@ common_pack() {
         # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
         # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
         # https://access.redhat.com/sites/default/files/attachments/rh_yum_cheatsheet_1214_jcs_print-1.pdf
-        echo "Detected compatible OS: $OS"
+        echo "Detected compatible OS: $OS_NAME"
         echo "Using yum to install common packages."
 
         sudo yum check-update
         sudo yum install $COMMON_PACKAGES -y
     elif $ALPINE ; then 
-        echo "Detected compatible OS: $OS"
+        echo "Detected compatible OS: $OS_NAME"
         echo "Using apk to install common packages."
 
         sudo apk update
         sudo apk add $COMMON_PACKAGES #apk automatically has equivalent -y functionality
     elif $SLACK ; then 
-        echo "Detected compatible OS: $OS"
+        echo "Detected compatible OS: $OS_NAME"
         echo "Using slapt-get to install common packages."
 
         #sudo slapt-get update #Not a thing for slapt-get
         sudo slapt-get --install $COMMON_PACKAGES
     else
-        echo "Unsupported or unknown OS detected: $OS"
+        echo "Unsupported or unknown OS detected: $OS_NAME"
         read -p "Please enter the command to update the package manager's list of available packages (such as 'apt update'): " PKG_UPDATE < /dev/tty
         read -p "If applicable, add any arguments you wish to add to the update command: " PKG_UPDATE_ARGS < /dev/tty
         read -p "Please enter the command to install a new package (such as 'apt install'): " PKG_INSTALL < /dev/tty
@@ -275,9 +201,12 @@ finish() {
     # At end, delete this file as there's no reason to keep it around
     # Shred is probably overkill
     # currentscript="$0"
-    echo "Securely shredding '$0'"
+    echo "Securely shredding '$0' and associated os_detection.sh and os.txt"
     shred -u $0 #this errors with quotes, however, if we don't have quotes then it *might* stop at the first space in the file path and delete that new path
                     # However, our usage case doesn't involve a full path, and it'll work fine when executed from the same directory, or in a full path without a space
+    # Delete OS stuff too because theyre gonna be in a random place (where downloader.sh was downloaded and executed) instead of with the rest of the scripts. Some other setup script (ansible?) will re-execute OS detection in its proper place (downloaded git repo folder)
+    shred -u "./os_detection.sh"
+    shred -u "./os.txt"
 }
 
 
@@ -286,6 +215,7 @@ finish() {
 # Main code
 #################################################
 
+setup_os_detection
 common_pack
 bash_rep
 setup_honeypot
