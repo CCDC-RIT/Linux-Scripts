@@ -97,13 +97,6 @@ AMZ() {
 }
 
 #Determines OS
-DEBIAN=false
-UBUNTU=false
-REDHAT=false
-ALPINE=false
-SLACK=false
-AMZ=false
-RHEL=false
 if [ -e /etc/debian_version ] ; then
     DEBIAN
 elif [ -e /etc/redhat-release ] ; then
