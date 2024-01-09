@@ -99,15 +99,15 @@ WORLDWRITABLE=$( find /usr /bin/ /sbin /var/www/ lib -perm -o=w -type f -exec ls
 
 echo -e "Inventory\n"
 
-echo -e "\nHost Info\n"
+echo -e "--Host Info--"
 echo -e "Hostname: $HOSTNAME"
 echo -e "OS: $OS"
-echo -e "IP Addresses/Interfaces: $IP"
-echo -e "Users: $USERS"
-echo -e "Sudoers: $SUDOERS"
-echo -e "Sudo Group Users: $SUDOGROUP"
-echo -e "SUIDS: $SUIDS"
-echo -e "World Writable Files: $WORLDWRITABLE"
+echo -e "IP Addresses/Interfaces: \n$IP"
+echo -e "Users: \n$USERS"
+echo -e "Sudoers: \n$SUDOERS"
+echo -e "Sudo Group Users: \n$SUDOGROUP"
+echo -e "SUIDS: \n$SUIDS"
+echo -e "World Writable Files: \n$WORLDWRITABLE"
 
 #this might go to the services script that ima make tomorrow
 #Listening ports
