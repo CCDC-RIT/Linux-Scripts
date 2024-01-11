@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
+
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
 if [ -e /etc/redhat-release ]; then
     os_type="RHEL"
@@ -97,6 +99,21 @@ find_auto_runs() {
 sysctl(){
     cat configs/sysctl.conf > /etc/sysctl.conf
 }
+
+aliases(){
+	for user in $(cat users.txt); do
+        	cat configs/bashrc > /home/$user/.bashrc;
+	done;
+	cat configs/bashrc > /root/.bashrc
+	cat configs/profile > /etc/profile
+}
+
+
+configCmds(){
+	cat configs/adduser.conf > /etc/adduser.conf
+	cat configs/deluser.conf > /etc/deluser.conf
+}
+
 # main
 
 backups
@@ -104,6 +121,8 @@ reset_environment
 sed_ssh
 check_ssh_keys
 sysctl
+aliases
+configCmds
 
 # add more here
 
