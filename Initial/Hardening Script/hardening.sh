@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# by: Justin Huang (jznn)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
@@ -9,10 +10,15 @@ if [ -e /etc/redhat-release ]; then
 elif [ -e /etc/debian_version ]; then
     os_type="Debian"
 
-#5 min plan script
+# verify that script is being run with root privileges
 if  [ "$EUID" -ne 0 ]; then 
     echo "User is not root. Skill issue."
     exit 
+fi
+
+if [ ! -f "./users.txt" ]; then
+    echo "Necessary text files for users is not present. Shutting down script."
+    exit 1
 fi
 
 backups() {
@@ -42,7 +48,6 @@ backups() {
 }
 
 # Sed sshd_config
-
 sed_ssh() {
     sed -i.bak 's/.*\(#\)\?Port.*/Port 22/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?Protocol.*/Protocol 2/g' /etc/ssh/sshd_config
@@ -72,10 +77,26 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?UseLogin.*/UseLogin yes/g' /etc/ssh/sshd_config
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM no/g' /etc/ssh/sshd_config
-    echo "Edited sshd_config"
+    echo "Edited sshd_config, ssh service restarting"
+    systemctl restart ssh
+}
+
+fix_corrupt(){
+    if [ "$os_type" = "RHEL" ]; then
+        echo "fixing corrupt packages"
+        rpm -qf $(rpm -Va 2>&1 | grep -vE '^$|prelink:' | sed 's|.* /|/|') | sort -u
+    fi
+
+    if [ "$os_type" = "Debian" ]; then
+        echo "fixing corrupt packages"
+        apt-fast install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
+        echo "fixing files with missing files"
+        xargs -rd '\n' -a <(sudo debsums -c 2>&1 | cut -d " " -f 4 | sort -u | xargs -rd '\n' -- dpkg -S | cut -d : -f 1 | sort -u) -- sudo apt-get install -f --reinstall --
+    fi
 }
 
 reset_environment() {
+    echo "\n Resetting PATH variable"
     echo "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games\"" > /etc/environment
 }
 
@@ -96,11 +117,14 @@ find_auto_runs() {
     $s systemctl list-timers
 }
 
-sysctl(){
+kernel(){
+    echo "\n Resetting sysctl.conf file"
     cat configs/sysctl.conf > /etc/sysctl.conf
+    echo 0 > /proc/sys/kernel/unprivileged_userns_clone
 }
 
 aliases(){
+    echo "\n Resetting user bashrc files and profile file" 
 	for user in $(cat users.txt); do
         	cat configs/bashrc > /home/$user/.bashrc;
 	done;
@@ -108,19 +132,20 @@ aliases(){
 	cat configs/profile > /etc/profile
 }
 
-
 configCmds(){
 	cat configs/adduser.conf > /etc/adduser.conf
 	cat configs/deluser.conf > /etc/deluser.conf
 }
 
+
 # main
 
 backups
+fix_corrupt
 reset_environment
 sed_ssh
 check_ssh_keys
-sysctl
+kernel
 aliases
 configCmds
 
