@@ -10,3 +10,6 @@ kubectl get --all-namespaces nodes -o wide
 echo ""
 echo "-------------------------- Pods --------------------------"
 kubectl get --all-namespaces pods -o wide
+kubectl describe --all-namespaces pods > pods.txt
+echo ""
+echo "More details about pods can be found in the newly created pods.txt"
