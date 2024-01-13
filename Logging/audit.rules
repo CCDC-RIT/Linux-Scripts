@@ -366,6 +366,11 @@
 ## Startup
 -w /etc/rc.local -p wa -k possible_rcscript_attack
 
+## PwnKit detection
+-w /usr/bin/pkexec -p x
+-w /usr/bin/curl -p x
+-w /usr/bin/wget -p -x
+
 ## Auditd rules that detect command execution from user www-data.
 -a always,exit -F arch=b32 -S execve -F uid=<USER_ID> -F key=webshell_command_exec
 -a always,exit -F arch=b64 -S execve -F uid=<USER_ID> -F key=webshell_command_exec
