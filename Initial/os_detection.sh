@@ -94,5 +94,8 @@ done
 # Make os file read-only for all users to attempt to prevent injection of malicious code,
 # as the contents gets executed whenever someone tries to read the os info
 chmod 0444 os.txt
+# More advanced immutability that should slow down even root access
+# Available on most distributions, however does not work on all filesystems. Don't bother OS checking for this, either it works or it doesn't.
+chattr +i os.txt
 
 echo "Results written to read-only file!"
