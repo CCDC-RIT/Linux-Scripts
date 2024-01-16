@@ -146,3 +146,20 @@ else
     echo "Please proceed to install Wazuh Agent manually."
     exit
 fi
+
+# Filepath *should* be the same in all OSes according to docs
+# https://documentation.wazuh.com/current/user-manual/reference/statistics-files/wazuh-agentd-state.html
+filepath=/var/ossec/var/run/wazuh-agentd.state
+if [ -e "$filepath" ]; then
+    # echo "File exists."
+    if grep -q "status='connected'" $filepath; then
+        # echo "The file contains 'status=connected'."
+        echo "Wazuh client agent has connected to the manager successfully!"
+    else
+        # echo "The file does not contain 'status=connected'."
+        echo "Wazuh client agent has not connected to the manager successfully, see $filepath for details!"
+    fi
+else
+    echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
+    # Your code here if the file does not exist
+fi
