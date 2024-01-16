@@ -50,10 +50,29 @@ change_all_idm()
     read -s -p "Please enter new password: " PASS < /dev/tty
 	echo "Setting passwords..."
 	while IFS= read -r user; do
-        echo -e "$PASS\n$PASS"|ipa user-mod $user --password
+        echo -e "$PASS\n$PASS"|ipa user-mod $user --password #Pipes in the provided password to the password prompt
 	done < idm_users.txt
     echo "Done."
 }
+
+
+change_passwords_idm(){ 
+    read -p "Provide the name of a file containing the usernames of each IDM user whose password you want to change, one per line" user_file
+    if [ ! -f "$user_file" ]; then
+        echo "Error: File not found."
+        return 1
+    fi
+    # prompt for password to be used
+    read -s -p "Please enter password to be added to new user: " PASS < /dev/tty
+    # Read each line from the file and change the password for each user
+    while IFS= read -r user; do
+        if [ -n "$user" ]; then
+            echo "Changing password for user: $user"
+            echo -e "$PASS\n$PASS"|ipa user-mod $user --password
+        fi
+    done < "$user_file"
+}
+
 
 # change passwords for certain users
 change_passwords(){ 
@@ -110,7 +129,8 @@ display_options() {
     echo "5. Disable certain users (provide file) and apply proper user properties"
 	echo "6. List all users in the RHEL IDM domain"
     echo "7. Change passwords for all IDM users"
-    echo "8. Exit"
+    echo "8. Change passwords for certain IDM users (provide file)"
+    echo "9. Exit"
 }
 
 # function to handle user input
@@ -139,6 +159,9 @@ handle_input() {
             change_all_idm
             ;;
         8)
+            change_passwords_idm
+            ;;
+        9)
             echo "Exiting script. Goodbye!"
             exit 0
             ;;
