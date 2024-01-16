@@ -127,6 +127,20 @@ disable_users(){
     done < "$user_file"
 }
 
+#Based on disable_users function but replacing the commands to disable users and change to honeypot shell to be the RHEL IDM command to disable user
+disable_users_idm(){
+    read -p "Provide the name of a file containing the usernames of each user who should be disabled, one per line" user_file
+    if [ ! -f "$user_file" ]; then
+        echo "Error: File not found."
+        return 1
+    fi
+    while IFS= read -r user; do
+        if [ -n "$user" ]; then
+            ipa user-disable $user
+        fi
+    done < "$user_file"
+}
+
 # function to display options for user input
 display_options() {
     echo "Menu:"
@@ -139,7 +153,8 @@ display_options() {
     echo "7. Change passwords for all IDM users"
     echo "8. Change passwords for certain IDM users (provide file)"
     echo "9. Disable all IDM users in list"
-    echo "10. Exit"
+    echo "10. Disable certain IDM users (provide file)"
+    echo "11. Exit"
 }
 
 # function to handle user input
@@ -174,6 +189,9 @@ handle_input() {
             disable_all_idm
             ;;
         10)
+            disable_users_idm
+            ;;
+        11)
             echo "Exiting script. Goodbye!"
             exit 0
             ;;
