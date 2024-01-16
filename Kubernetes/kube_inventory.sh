@@ -8,6 +8,10 @@ echo "------------------------- Nodes --------------------------"
 kubectl get --all-namespaces nodes -o wide
 
 echo ""
+echo "---------------------- Deployments -----------------------"
+kubectl get --all-namespaces deployments
+
+echo ""
 echo "-------------------------- Pods --------------------------"
 kubectl get --all-namespaces pods -o wide
 kubectl describe --all-namespaces pods > pods.txt
