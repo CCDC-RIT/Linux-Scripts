@@ -104,6 +104,14 @@ disable_all() {
 	done < users.txt
 }
 
+#Disables all IDM user accounts in idm_users.txt
+disable_all_idm() {
+    #To-do: force Kerberos ticket expiry as existing connections remain valid until the ticket expires
+    while IFS= read -r user; do
+        ipa user-disable $user #Note: this user will still show up when retrieving users although it is disabled, as it has not been deleted. These users cannot authenticate and use any Kerberos services or do any tasks while the IDM account is disabled
+	done < idm_users.txt
+}
+
 disable_users(){
     read -p "Provide the name of a file containing the usernames of each user who should be disabled, one per line" user_file
     if [ ! -f "$user_file" ]; then
@@ -130,7 +138,8 @@ display_options() {
 	echo "6. List all users in the RHEL IDM domain"
     echo "7. Change passwords for all IDM users"
     echo "8. Change passwords for certain IDM users (provide file)"
-    echo "9. Exit"
+    echo "9. Disable all IDM users in list"
+    echo "10. Exit"
 }
 
 # function to handle user input
@@ -162,6 +171,9 @@ handle_input() {
             change_passwords_idm
             ;;
         9)
+            disable_all_idm
+            ;;
+        10)
             echo "Exiting script. Goodbye!"
             exit 0
             ;;
