@@ -9,6 +9,11 @@
 # TODO: test run
 
 # print list of users to stdout
+if [ "$EUID" -ne 0 ]; then 
+  echo "Run as sudo to prevent lockout"
+  exit
+fi
+
 list_users() {
     echo "Current Users: "
     while IFS= read -r user; do

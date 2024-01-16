@@ -6,6 +6,7 @@
 
 # Issues:
 # Are these problematic variable names? i.e. DEBIAN might be an easily-confused variable
+# Only debian and ubuntu are tested afaik
 
 #OS variable storage
 osArray=(DEBIAN REDHAT ALPINE SLACK AMZ)
@@ -15,8 +16,8 @@ osArray+=(UBUNTU)
 #MINT ELEMENTARY KALI RASPBIAN PROMOXVE ANTIX
 
 #Red Hat Distributions
-osArray+=(RHEL)
-#CENTOS FEDORA ORACLE ROCKY ALMA
+osArray+=(RHEL FEDORA)
+#CENTOS ORACLE ROCKY ALMA
 
 #Alpine Distributions
 #ADELIE WSL
@@ -37,6 +38,10 @@ DEBIAN_INIT(){
         OS_NAME="Ubuntu"
     fi
     #add more for each debian distro later
+}
+FEDORA_INIT(){
+    FEDORA=true
+    OS_NAME="Fedora"
 }
 REDHAT_INIT(){
     REDHAT=true
@@ -67,6 +72,9 @@ echo "Checking OS type..."
 #Determines OS
 if [ -e /etc/debian_version ] ; then
     DEBIAN_INIT
+elif [ -e /etc/fedora-release ] ; then
+    # not tested
+    FEDORA_INIT
 elif [ -e /etc/redhat-release ] ; then
     REDHAT_INIT
 elif [ -e /etc/alpine-release ] ; then
@@ -94,5 +102,8 @@ done
 # Make os file read-only for all users to attempt to prevent injection of malicious code,
 # as the contents gets executed whenever someone tries to read the os info
 chmod 0444 os.txt
+# More advanced immutability that should slow down even root access
+# Available on most distributions, however does not work on all filesystems. Don't bother OS checking for this, either it works or it doesn't.
+chattr +i os.txt
 
 echo "Results written to read-only file!"
