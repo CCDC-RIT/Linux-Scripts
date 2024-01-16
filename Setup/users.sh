@@ -3,6 +3,7 @@
 
 # Objective: provides option for user to change passwords and disable users
 # Pre-condition: a file called users.txt exists in the same directory, with a list of users whose information should be changed (can be obtained by running getUsers.sh)
+# Additional pre-condition for RHEL IDM functionality: Valid Kerberos ticket (obtained by using the "kinit admin" command) and a file called idm_users.txt exists in the current directory, which can be created by running getIDMusers.sh or idm_usersAndGroups.sh
 
 # TODO: add RHEL IDM functionality
 # TODO: test run
@@ -13,6 +14,15 @@ list_users() {
     while IFS= read -r user; do
         echo "$user"
     done < users.txt
+}
+
+list_idm_users() {
+	#Derived from list_users but changed slightly to incorporate RHEL IDM functionality 
+	echo "RHEL IDM Users: "
+	while IFS= read -r user; do
+        echo "$user"
+    done < idm_users.txt
+	
 }
 
 # change passwords for all user accounts in users.txt 
@@ -27,6 +37,17 @@ change_all()
 		echo $user:$PASS | chpasswd; 
 		chage --maxdays 15 --mindays 6 --warndays 7 --inactive 5 $user;
 	done < users.txt
+}
+
+change_all_idm()
+{   
+    # prompt for password to be used
+    read -s -p "Please enter new password: " PASS < /dev/tty
+	echo "Setting passwords..."
+	while IFS= read -r user; do
+        echo -e "$PASS\n$PASS"|ipa user-mod $user --password
+	done < idm_users.txt
+    echo "Done."
 }
 
 # change passwords for certain users
@@ -82,7 +103,9 @@ display_options() {
     echo "3. Change password for certain users (provide file)"
     echo "4. Disable all users in list and apply proper user properties"
     echo "5. Disable certain users (provide file) and apply proper user properties"
-    echo "6. Exit"
+	echo "6. List all users in the RHEL IDM domain"
+    echo "7. Change passwords for all IDM users"
+    echo "8. Exit"
 }
 
 # function to handle user input
@@ -104,7 +127,13 @@ handle_input() {
         5)
             disable_users
             ;;
-        6)
+		6)
+			list_idm_users
+			;;
+        7)
+            change_all_idm
+            ;;
+        8)
             echo "Exiting script. Goodbye!"
             exit 0
             ;;
