@@ -139,30 +139,30 @@ configCmds(){
 
 noIpv6(){
     echo "/n Removing IPv6..."
+    interfaces=$(ifconfig | grep "flags" | awk '{print $1}' | tr -d ':')
     if [ os_type == "Debian" ]; then
         echo "removing IPv6 from sysctl"
         echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
         echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
         echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
         sysctl -p
-        interfaces=$(ifconfig | grep "flags" | awk '{print $1}' | tr -d ':')
         echo "removing IPv6 on each interface"
-        if [ -e /etc/networks/interfaces ]; then
-            in="/etc/networks/interfaces"
-            echo "using /etc/networks/interfaces"
+        in="/etc/networks/interfaces"
+        if [ -e "$in" ]; then
+            echo -e "using $in"
             for interface in $interfaces; do
                 echo "iface $interface inet6 manual" >> "$in"
             done
             echo "Networking interface configuration applied"
         fi
-        if [ -e /etc/netplan ]; then
-            np="/etc/netplan/01-netcfg.yaml"
-            echo "using /etc/netplan"
+        np="/etc/netplan/01-netcfg.yaml"
+        if [ -e "$np" ]; then
+            echo -e "using $np"
             echo "network:" >> "$np"
             echo "  version: 2" >> "$np"
             echo "  ethernets:" >> "$np"
             for interface in $interfaces; do
-                echo "    $interface:" >> "$np"
+                echo -e "    $interface:" >> "$np"
                 echo "      dhcp4: true" >> "$np"
                 echo "      dhcp6: false" >> "$np"
             done
@@ -171,6 +171,22 @@ noIpv6(){
             netplan apply
             echo "Netplan configuration applied"
         fi
+    elif [ $os_type == "RHEL" ]; then
+        sysctl="/etc/sysctl.conf"
+        if [ -e "$sysctl" ]; then
+            echo "using sysctl"
+            echo "net.ipv6.conf.all.disable_ipv6 = 1" >> "$sysctl"
+            echo "net.ipv6.conf.default.disable_ipv6 = 1" >> "$sysctl"
+            sysctl -p
+        fi
+        for interface in $interfaces; do
+            sysconfig="/etc/sysconfig/network-scripts/ifcfg-$interface"
+            if [ -e "$sysconfig" ]; then
+                echo -e "using $sysconfig"
+                echo "IPV6INIT=no" >> "$sysconfig"
+            fi
+        done
+        service network restart
     fi
 }
 
