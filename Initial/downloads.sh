@@ -187,12 +187,14 @@ fetch_all_scripts() {
     # If we didn't make an admin user, just download to the current directory
     if ! [ -z "$NAME" ];
     then
-        # If we did make an admin user, then toss the scripts into their home
+        # If we did make an admin user, then toss the scripts into their home and make them all editable
         git clone https://github.com/CCDC-RIT/Linux-Scripts/ /home/$NAME/Linux-Scripts
+        find /home/$NAME/Linux-Scripts -type f -iname "*.sh" -exec chmod +x {} \;
         echo "Scripts have been downloaded to /home/$NAME/Linux-Scripts"
     else
-        # If we didn't make an admin user, then toss the scripts into the current directory
+        # If we didn't make an admin user, then toss the scripts into the current directory and make them all editable
         git clone https://github.com/CCDC-RIT/Linux-Scripts/
+        find ./ -type f -iname "*.sh" -exec chmod +x {} \;
         echo "Scripts have been downloaded to ./Linux-Scripts"
     fi
 }
