@@ -108,7 +108,9 @@ disable_all() {
 disable_all_idm() {
     #To-do: force Kerberos ticket expiry as existing connections remain valid until the ticket expires
     while IFS= read -r user; do
-        ipa user-disable $user #Note: this user will still show up when retrieving users although it is disabled, as it has not been deleted. These users cannot authenticate and use any Kerberos services or do any tasks while the IDM account is disabled
+        if [ "$user" != "admin" ]; then
+            ipa user-disable $user #Note: this user will still show up when retrieving users although it is disabled, as it has not been deleted. These users cannot authenticate and use any Kerberos services or do any tasks while the IDM account is disabled
+        fi
 	done < idm_users.txt
 }
 
@@ -152,7 +154,7 @@ display_options() {
 	echo "6. List all users in the RHEL IDM domain"
     echo "7. Change passwords for all IDM users"
     echo "8. Change passwords for certain IDM users (provide file)"
-    echo "9. Disable all IDM users in list"
+    echo "9. Disable all IDM users except for admin"
     echo "10. Disable certain IDM users (provide file)"
     echo "11. Exit"
 }

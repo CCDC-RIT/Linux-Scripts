@@ -12,7 +12,7 @@
 
 # Import the OS variables
 # Needs os_detection.sh to run first
-PATH_TO_OS_RESULTS_FILE="./os.txt"
+PATH_TO_OS_RESULTS_FILE="../Initial/os.txt" #default path is set to use os.txt as created by Linux-Scripts/Initial/os_detection.sh
 if [ -f $PATH_TO_OS_RESULTS_FILE ] ; then
     source $PATH_TO_OS_RESULTS_FILE
 else
@@ -30,7 +30,7 @@ fi
 get_install_options() {
     read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
     read -p "Enter port number of Wazuh manager to connect to: " WAZUH_PORT < /dev/tty
-    read -p "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
+    read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
     read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
 }
 

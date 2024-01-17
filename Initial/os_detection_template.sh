@@ -31,7 +31,7 @@ if $DEBIAN || $UBUNTU ; then
 
     sudo apt update
     sudo apt install curl -y #-y for say yes to everything
-elif $REDHAT || $RHEL || $AMZ ; then 
+elif $REDHAT || $RHEL || $AMZ || $FEDORA; then 
     # These all use YUM (or uses YUM as an alias for the actual one) for package manager
     echo "Detected compatible OS: $OS_NAME"
     echo "Using yum to install common packages."
