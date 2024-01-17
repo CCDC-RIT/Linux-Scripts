@@ -51,12 +51,12 @@ if $DEBIAN || $UBUNTU ; then
     echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
     apt-get update
     
-    # Install Wazuh
+    # Install Wazuh (specifically, 4.7.1 for some reason)
     # TODO other install variables?
     get_install_options
     WAZUH_MANAGER="${WAZUH_ADDRESS}" WAZUH_MANAGER="${WAZUH_PORT}" \
      WAZUH_REGISTRATION_PASSWORD="${WAZUH_PASSWORD}" WAZUH_AGENT_GROUP="${WAZUH_GROUP}" \
-      apt-get install wazuh-agent
+      apt-get install wazuh-agent=4.7.1
 
     # Enable and start the Wazuh agent service 
     systemctl daemon-reload
