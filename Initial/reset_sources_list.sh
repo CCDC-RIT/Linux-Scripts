@@ -38,6 +38,7 @@ if $DEBIAN ; then
 
     mv /etc/apt/sources.list /etc/apt/sources.list.backup
     mv /etc/apt/sources.list.d /etc/apt/sources.list.d.backup
+    mkdir /etc/apt/sources.list.d
 
     if $UBUNTU ; then 
         #Ubuntu
@@ -45,9 +46,12 @@ if $DEBIAN ; then
         ubuntu_version=$(lsb_release -sc)
 
         # Define sources.list entries based on Ubuntu version
+        # TODO this includes the tabs, no functional value lost but its annoying
         sources_list_entries="
-        deb http://archive.ubuntu.com/ubuntu/ $ubuntu_version main restricted
-        deb-src http://archive.ubuntu.com/ubuntu/ $ubuntu_version main restricted
+        deb http://us.archive.ubuntu.com/ubuntu/ $ubuntu_version main restricted
+        # deb-src http://us.archive.ubuntu.com/ubuntu/ $ubuntu_version main restricted
+        deb http://us.archive.ubuntu.com/ubuntu/ ${ubuntu_version}-security main restricted
+        # deb-src http://us.archive.ubuntu.com/ubuntu/ ${ubuntu_version}-security main restricted
         "
     else
         #Debian
@@ -56,8 +60,10 @@ if $DEBIAN ; then
 
         # Define sources.list entries based on Debian version
         sources_list_entries="
-        deb http://deb.debian.org/debian/ $debian_version main
-        deb-src http://deb.debian.org/debian/ $debian_version main
+        deb http://ftp.us.debian.org/debian/ $debian_version main
+        # deb-src http://ftp.us.debian.org/debian/ $debian_version main
+        deb http://ftp.us.debian.org/debian/ ${debian_version}-security main
+        # deb-src http://ftp.us.debian.org/debian/ ${debian_version}-security main
         "
     fi
 
@@ -81,9 +87,10 @@ elif $REDHAT || $RHEL; then
     # TODO does this os have a sources.list.d equivalent?
 
     # Get RHEL or CentOS version
-    rhel_version=$(rpm -E %{rhel})
+    #rhel_version=$(rpm -E %{rhel})
 
     # Define repository entries based on RHEL or CentOS version
+    : '
     repo_entries="
     [base]
     name=Red Hat Enterprise Linux \$releasever - Base
@@ -106,21 +113,51 @@ elif $REDHAT || $RHEL; then
     enabled=1
     gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
     "
+    '
 
     # Backup existing yum configuration
-    mv /etc/yum.repos.d/redhat.repo /etc/yum.repos.d/redhat.repo.backup
+    # mv /etc/yum.repos.d/redhat.repo /etc/yum.repos.d/redhat.repo.backup
+
+    # Apparently after deleting redhat.repo, you can run this command to rebuild the list
+    # Dunno how reliable it is...
+    #subscription-manager refresh
 
     # Write new entries to yum configuration
-    echo "$repo_entries" | tee /etc/yum.repos.d/redhat.repo > /dev/null
+    # echo "$repo_entries" | tee /etc/yum.repos.d/redhat.repo > /dev/null
 
     # Clean metadata and refresh repositories
-    yum clean all
-    yum makecache
+    # yum clean all
+    # yum makecache
 
-    echo "/etc/yum.repos.d/redhat.repo has been reset!"
+    # New method from here: https://access.redhat.com/discussions/5471181#comment-1929481
+
+    # Backup existing yum configuration
+    mv /etc/yum.repos.d/ /etc/yum.repos.d.backup
+
+    yum clean all
+
+    rm -r /var/cache/yum/*
+    rm -r /etc/yum.repos.d/*
+
+    subscription-manager remove --all
+    subscription-manager unregister
+    subscription-manager clean
+
+    subscription-manager register
+    subscription-manager refresh
+
+    subscription-manager list --available
+    # I dunno what a pool is so lets auto register
+    #subscription-manager attach --pool=<Pool-ID>
+    subscription-manager attach --auto
+
+    yum update
+
+    echo "/etc/yum.repos.d has been reset!"
     echo "You can find the original file at the same file path, just renamed with the suffix '.backup'"
     
 elif $AMZ ; then 
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/add-repositories.html
     # TODO this is only for amazon linux 2!
     # TODO test
     # TODO are these the minimal/necessary repos?
