@@ -29,7 +29,7 @@ fi
 
 get_install_options() {
     read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
-    read -p "Enter port number of Wazuh manager to connect to: " WAZUH_PORT < /dev/tty
+    read -p "Enter port number of Wazuh manager to connect to (Recommend 1514): " WAZUH_PORT < /dev/tty
     read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
     read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
 }
@@ -58,10 +58,19 @@ if $DEBIAN || $UBUNTU ; then
      WAZUH_REGISTRATION_PASSWORD="${WAZUH_PASSWORD}" WAZUH_AGENT_GROUP="${WAZUH_GROUP}" \
       apt-get install wazuh-agent=4.7.1
 
-    # Enable and start the Wazuh agent service 
+    # Enable and start the Wazuh agent service
     systemctl daemon-reload
     systemctl enable wazuh-agent
     systemctl start wazuh-agent
+
+    # Install wazuh config file
+    VERSION=lsb_release -si
+    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
+    sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
+    sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
+    sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf
+    sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/g' /var/ossec/etc/ossec.conf
+    # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password
 
     # After install, remove Wazuh repo to prevent potential updates and getting out of sync from the manager
     sed -i "s/^deb/#deb/" /etc/apt/sources.list.d/wazuh.list
@@ -103,6 +112,15 @@ elif $REDHAT || $RHEL || $AMZ ; then
     systemctl daemon-reload
     systemctl enable wazuh-agent
     systemctl start wazuh-agent
+
+    # Install wazuh config file
+    VERSION=lsb_release -si
+    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
+    sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
+    sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
+    sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf
+    sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/g' /var/ossec/etc/ossec.conf
+    # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password
 
     # After install, remove Wazuh repo to prevent potential updates and getting out of sync from the manager
     sed -i "s/^enabled=1/enabled=0/" /etc/yum.repos.d/wazuh.repo
