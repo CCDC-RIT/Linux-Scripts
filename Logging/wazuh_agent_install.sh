@@ -97,7 +97,7 @@ elif $REDHAT || $RHEL || $AMZ ; then
     # TODO other install variables?
     WAZUH_MANAGER="${WAZUH_ADDRESS}" WAZUH_MANAGER="${WAZUH_PORT}" \
      WAZUH_REGISTRATION_PASSWORD="${WAZUH_PASSWORD}" WAZUH_AGENT_GROUP="${WAZUH_GROUP}" \
-      yum install wazuh-agent
+      yum install wazuh-agent-4.7.1
 
     # Enable and start the Wazuh agent service 
     systemctl daemon-reload
@@ -122,7 +122,7 @@ elif $ALPINE ; then
     apk update
 
     # Install Wazuh
-    apk add wazuh-agent
+    apk add wazuh-agent=4.7.1
     
     #todo variables
     echo "WARNING: Installer for $OS_NAME cannot automatically add configuration details like manager IP address."
