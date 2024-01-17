@@ -12,7 +12,7 @@
 
 # Import the OS variables
 # Needs os_detection.sh to run first
-PATH_TO_OS_RESULTS_FILE="./os.txt"
+PATH_TO_OS_RESULTS_FILE="../Initial/os.txt" #default path is set to use os.txt as created by Linux-Scripts/Initial/os_detection.sh
 if [ -f $PATH_TO_OS_RESULTS_FILE ] ; then
     source $PATH_TO_OS_RESULTS_FILE
 else
