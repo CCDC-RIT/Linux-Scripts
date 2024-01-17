@@ -56,7 +56,7 @@ if $DEBIAN || $UBUNTU ; then
     get_install_options
     WAZUH_MANAGER="${WAZUH_ADDRESS}" WAZUH_MANAGER="${WAZUH_PORT}" \
      WAZUH_REGISTRATION_PASSWORD="${WAZUH_PASSWORD}" WAZUH_AGENT_GROUP="${WAZUH_GROUP}" \
-      apt-get install wazuh-agent=4.7.1
+      apt-get install wazuh-agent
 
     # Enable and start the Wazuh agent service
     systemctl daemon-reload
@@ -140,7 +140,7 @@ elif $ALPINE ; then
     apk update
 
     # Install Wazuh
-    apk add wazuh-agent=4.7.1
+    apk add wazuh-agent
     
     #todo variables
     echo "WARNING: Installer for $OS_NAME cannot automatically add configuration details like manager IP address."
