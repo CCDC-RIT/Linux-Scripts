@@ -30,7 +30,7 @@ fi
 get_install_options() {
     read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
     read -p "Enter port number of Wazuh manager to connect to: " WAZUH_PORT < /dev/tty
-    read -p "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
+    read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
     read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
 }
 
