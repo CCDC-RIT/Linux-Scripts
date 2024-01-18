@@ -154,9 +154,9 @@ common_pack() {
 }
 
 reinstall(){
-       # Install common packages
-    echo "Installing common packages..."
-    # curl may be pre-installed in order to fetch this installer script in the first place...
+    # Reinstall common essential packages
+    echo "Reinstalling common essential packages..."
+
     COMMON_PACKAGES="passwd *pam* openssh-server"
     
     # Change package manager depending on OS
@@ -177,18 +177,15 @@ reinstall(){
         yum reinstall $COMMON_PACKAGES -y
     elif $ALPINE ; then 
         echo "Detected compatible OS: $OS_NAME"
-        echo "Using apk to install common packages."
+        echo "Using apk to reinstall common packages."
 
         apk update
         apk fix -r $COMMON_PACKAGES #apk reinstalling
-    
-        # TODO osquery
     else
         echo "Unsupported or unknown OS detected: $OS_NAME"
-        
     fi
 
-    echo "Finished installing packages."
+    echo "Finished reinstalling packages."
 }
 
 bash_rep() {
@@ -341,6 +338,8 @@ finish() {
 # Then common packages, then fetch all scripts, then everything that depends on repo (installing configs)
 # If you're running this script offline, comment out os detect, common pack, and fetch scripts (you will need Linux-Scripts repo folder in the same directory as this script!)
 setup_os_detection
+
+reinstall
 common_pack
 fetch_all_scripts
 setup_honeypot
