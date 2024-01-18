@@ -82,15 +82,6 @@ check_ssh_keys() {
     $s head -n 20 /root/.ssh/authorized_keys*
 }
 
-find_auto_runs() {
-    echo "\n Checking for autoruns..."
-    s="sudo"
-    $s cat /etc/crontab | grep -Ev '#|PATH|SHELL'
-    $s cat /etc/cron.d/* | grep -Ev '#|PATH|SHELL'
-    $s find /var/spool/cron/crontabs/ -printf '%p\n' -exec cat {} \;
-    $s systemctl list-timers
-}
-
 kernel(){
     echo "\n Resetting sysctl.conf file"
     cat configs/sysctl.conf > /etc/sysctl.conf
@@ -169,24 +160,29 @@ noIpv6(){
 }
 
 cronConf(){
-    if [ "$os_type" == "RHEL" ]; then
-        cronConfsOwners=$(stat -c "%U %n" /etc/cron*)
-        IFS=$'\n'
-        for ownerConf in $cronConfsOwners; do
-            owner=$(echo "$ownerConf" | awk '{print $1}')
-            conf=$(echo "$ownerConf" | awk '{print $2}')
-            if [ "$owner" != "root" ]; then
-                echo "$owner owned $conf, setting owner to root"
-                chown root "$conf"
-                chgrp root "$conf"
-            fi
-        done
-        IFS=$''
-        cronConfsPermissions=$()
-    elif [ "$os_type" == "Ubuntu" ]; then
-        #ill do this shortly --hal
-    fi
- 
+    #works for both ubuntu and RHEL
+    IFS=$'\n'
+    cronOwnerConfs=$(find /etc -type f -o -type d -name 'cron*' -exec stat -c "%U %n" {} \;)
+    for ownerConf in $cronOwnerConfs; do
+        owner=$(echo "$ownerConf" | awk '{print $1}')
+        conf=$(echo "$ownerConf" | awk '{print $2}')
+        if [ "$owner" != "root" ]; then
+            echo "$owner owned $conf, setting owner to root"
+            chown root "$conf"
+            chgrp root "$conf"
+        fi
+    done
+    cronPermDirs=$(find /etc -type d -name 'cron*' -exec stat -c "%a %n" {} \;)
+    for permDir in $cronPermDirs; do
+        perm=$(echo "$permDir" | awk '{print $1}')
+        dir=$(echo "$permDir" | awk '{print $2}')
+        if [ "$perm" != "700" ]; then
+            echo "$dir Directory had $perm permisions, setting permissions to 700"
+            chmod 0700 "$dir"
+        fi
+    done
+    IFS=$''
+    
 }
 
 maybeMalware(){
@@ -377,7 +373,6 @@ chattr(){
 
 # main
 
-backups
 fix_corrupt
 reset_environment
 sed_ssh
