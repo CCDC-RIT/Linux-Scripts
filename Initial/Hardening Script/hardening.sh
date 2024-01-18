@@ -181,6 +181,10 @@ cronConf(){
             chmod 0700 "$dir"
         fi
     done
+    crontabPerms=$(find /etc/crontab -type f -name 'cron*' -exec stat -c "%a" {} \;)
+    if [ "$crontabPerms" != "600" ]; then
+        chmod 600 /etc/crontab
+    fi
     IFS=$''
     
 }
