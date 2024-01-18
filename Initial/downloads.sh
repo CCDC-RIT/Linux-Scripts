@@ -288,6 +288,33 @@ install_wazuh() {
     fi
 }
 
+nginx_setup() {
+    # If nginx appears to be installed, add our custom config file and restart it
+    if [[ -d "/etc/nginx/" ]]; then
+        # echo "Folder exists"
+        echo "Nginx install detected, adding custom config file!"
+
+        mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
+        cp Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf
+
+        # Restart service
+        if $DEBIAN || $UBUNTU || $REDHAT || $RHEL || $AMZ || $FEDORA; then
+            systemctl restart nginx
+            # There's some confusion as to use systemctl vs service...
+        elif $ALPINE ; then 
+            rc-service nginx restart
+        else
+            # Unknown OS. You can choose whether to just exit/do nothing with an error message, or to implement a custom fallback behavior.
+            echo "Unsupported or unknown OS detected for restarting nginx service automaticly: $OS_NAME"
+        fi
+
+        echo "Nginx config file installed, previous config file can be found at /etc/nginx/nginx.conf.backup!"
+    else
+        # echo "Folder does not exist"
+        echo "Nginx appears not to be installed (or not installed in the default location), nginx setup cancelled!"
+    fi
+}
+
 finish() {
     # At end, delete this file as there's no reason to keep it around
     # Shred is probably overkill
@@ -319,6 +346,7 @@ fetch_all_scripts
 setup_honeypot
 bash_rep
 install_wazuh
+nginx_setup
 
 echo "Downloads script complete!"
 
