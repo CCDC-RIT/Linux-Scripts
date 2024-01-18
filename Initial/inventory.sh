@@ -100,3 +100,7 @@ checkService 'telnet'; TELNET=$?
 checkService 'squid'; SQUID=$?
 checkService 'dropbear'; DROPBEAR=$?
 checkService 'cockpit'; COCKPIT=$?
+checkService 'cron'; CRON=$?
+checkService 'atd'; ATD=$?
+checkService 'cupsd'; CUPSD=$?
+checkService 'avahi-daemon'; AVAHI-DAEMON=$?

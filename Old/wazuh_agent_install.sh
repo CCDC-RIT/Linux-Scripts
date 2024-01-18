@@ -1,3 +1,5 @@
+# DEPRECATED, was merged into setup_logging.sh and downloads.sh
+
 #####################################################
 # Installs the Wazuh agent service on a *unix machine
 # Compatible with Debian (Tested), Ubuntu (Tested), RHEL, Amazon Linux, (partially) Alpine
@@ -181,3 +183,5 @@ else
     echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
     # Your code here if the file does not exist
 fi
+
+echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf

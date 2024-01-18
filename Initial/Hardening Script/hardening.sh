@@ -50,7 +50,7 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?TCPKeepAlive.*/TCPKeepAlive yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UseLogin.*/UseLogin yes/g' /etc/ssh/sshd_config
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
-    sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM no/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM yes/g' /etc/ssh/sshd_config
     echo "Edited sshd_config, ssh service restarting"
     systemctl restart ssh
 }
@@ -166,6 +166,26 @@ noIpv6(){
             service network restart
         fi
     fi
+}
+
+cronConf(){
+    if [ "$os_type" == "RHEL" ]; then
+        cronConfs=$(stat -c "%U %n" /etc/cron*)
+        IFS=$'\n'
+        for ownerConf in $cronConfs; do
+            owner=$(echo "$ownerConf" | awk '{print $1}')
+            conf=$(echo "$ownerConf" | awk '{print $2}')
+            if [ "$owner" != "root" ]; then
+                echo "$owner owned $conf, setting owner to root"
+                chown root "$conf"
+                chgrp root "$conf"
+            fi
+        done
+        IFS=$''
+    elif [ "$os_type" == "Ubuntu" ]; then
+        #ill do this shortly --hal
+    fi
+ 
 }
 
 maybeMalware(){
