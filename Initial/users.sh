@@ -143,6 +143,38 @@ disable_users_idm(){
     done < "$user_file"
 }
 
+add_admin_user() {
+    # Optionally adds a new blue team admin user
+    # Written by Guac0
+    # ~~Call this BEFORE fetch_all_scripts()~~ nvm due to migration to users.sh
+    # TODO is this password creation method secure enough?
+
+    # Prompt user for username and password for new admin user
+    echo "If you do not wish to make a new blue team admin user, leave it blank and proceed. Recommended name: 'blue'"
+    read -p "Please enter name of new blue team admin user (without spaces): " NAME < /dev/tty
+
+    # if given username is not empty, check if name already exists and then securely prompt for a password
+    if ! [ -z "$NAME" ];
+    then
+        # if given username is already in use, exit
+        if [ `id -u $NAME 2>/dev/null || echo -1` -ge 0 ]; # i tried a morbillion ways to detect this and this is the only one that works for some reason
+        then
+            echo 'A user with the provided admin username already exists, re-run this script and pick another one!'
+            exit
+        fi
+
+        read -s -p "Please enter password to be added to new admin user $NAME: " PASS < /dev/tty
+        echo "" #need to start a new line
+
+        # Add ability to create password at beginning and use as password for blue
+        echo "Adding new admin user $NAME..."
+        #useradd may error in debian as not found. to fix, exit the root session and begin a new one with su -l
+        useradd -p "$(openssl passwd -6 $PASS)" $NAME -m -G sudo
+    else
+        echo "Not adding an admin user due to configuration options suppressing this functionality!"
+    fi
+}
+
 # function to display options for user input
 display_options() {
     echo "Menu:"
@@ -156,6 +188,7 @@ display_options() {
     echo "8. Change passwords for certain IDM users (provide file)"
     echo "9. Disable all IDM users except for admin"
     echo "10. Disable certain IDM users (provide file)"
+    echo "11. Add new admin user"
     echo "11. Exit"
 }
 
@@ -194,6 +227,9 @@ handle_input() {
             disable_users_idm
             ;;
         11)
+            add_admin_user
+            ;;
+        12)
             echo "Exiting script. Goodbye!"
             exit 0
             ;;
