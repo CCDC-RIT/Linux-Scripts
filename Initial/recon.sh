@@ -143,6 +143,28 @@ verbose(){
     $s cat /etc/apt/sources.list | grep -Ev "##|#"
     sleep $t
 
+    echo -e "\n------------------\n > Malware? <\n------------------"
+    OS=$(cat /etc/os-release | grep "PRETTY_NAME" | grep -o "\".*.\"" | tr -d '"')
+    if [ "$OS" == "Ubuntu" ]; then
+      dpkg -l | grep "sniff"
+      dpkg -l | grep "packet" 
+      dpkg -l | grep "wireless" 
+      dpkg -l | grep "pen"
+      dpkg -l | grep "test" 
+      dpkg -l | grep "password" 
+      dpkg -l | grep "crack"
+      dpkg -l | grep "spoof" 
+      dpkg -l | grep "brute" 
+      dpkg -l | grep "log" 
+      dpkg -l | grep "key"
+      dpkg -l | grep "network" 
+      dpkg -l | grep "map" 
+      dpkg -l | grep "server"
+      dpkg -l | grep "CVE" 
+      dpkg -l | grep "exploit" 
+    else
+      echo "this approach dont work for RHEL cope"
+    fi
 }
 
 # Get User Input to get sleep time and Type
