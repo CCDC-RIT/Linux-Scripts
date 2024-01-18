@@ -1,3 +1,5 @@
+# DEPRECATED, was merged into setup_logging.sh and downloads.sh
+
 #####################################################
 # Installs the Wazuh agent service on a *unix machine
 # Compatible with Debian (Tested), Ubuntu (Tested), RHEL, Amazon Linux, (partially) Alpine
