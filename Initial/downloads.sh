@@ -204,6 +204,11 @@ install_wazuh() {
     # Change package manager depending on OS
     if $DEBIAN || $UBUNTU ; then
         echo "Detected compatible OS: $OS_NAME"
+        # Uninstall potential old Wazuh
+        # apt-get remove wazuh-agent
+        # apt-get remove --purge wazuh-agent # Removes config files
+        # systemctl disable wazuh-agent
+        # systemctl daemon-reload
         if $DEBIAN ; then
             dpkg -i Linux-Scripts/Binaries/Wazuh/wazuh-agent_4.7.2-1_amd64_debian.deb
         else
@@ -219,6 +224,10 @@ install_wazuh() {
         # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
         # https://access.redhat.com/sites/default/files/attachments/rh_yum_cheatsheet_1214_jcs_print-1.pdf
         echo "Detected compatible OS: $OS_NAME"
+        # Uninstall potential old Wazuh
+        #yum remove wazuh-agent
+        #systemctl disable wazuh-agent
+        #systemctl daemon-reload
         if $REDHAT || $RHEL ; then 
             dnf install Linux-Scripts/Binaries/Wazuh/wazuh-agent-4.7.2-1.x86_64_rhel.rpm
         elif $AMZ ; then
@@ -231,6 +240,8 @@ install_wazuh() {
     #elif $ALPINE ; then 
         #no alpine for now because chatgpt thinks im talking about android and we're not using it anyways
     #    echo "Detected compatible OS: $OS_NAME"
+        # Uninstall potential old Wazuh
+        # apk del wazuh-agent
     #
         # We'll handle setup in logging script...
     #    echo "Wazuh installed from local binary repo of v4.7.2-1! Configuration not completed, this will be done in the logging setup script."
