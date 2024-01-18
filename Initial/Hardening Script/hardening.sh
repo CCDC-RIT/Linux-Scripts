@@ -190,6 +190,14 @@ noIpv6(){
     fi
 }
 
+deleteBad(){
+    find / -name ".rhost" -exec rm -rf {} \;
+    find / -name "host.equiv" -exec rm -rf {} \;
+    sudo find / -iname '*.xlsx' -delete
+	sudo find / -iname '*.shosts' -delete
+	sudo find / -iname '*.shosts.equiv' -delete
+}
+
 perms(){
     chmod 755 /etc/resolvconf/resolv.conf.d/
     chmod 644 /etc/resolvconf/resolv.conf.d/base
