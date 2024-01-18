@@ -136,7 +136,16 @@ verbose(){
     sleep $t
 
     echo -e "\n------------------------------\n > Files Modified Last 10Min <\n------------------------------ "
+    echo -e "/etc"
     $s find / -xdev -mmin -10 -ls 2> /dev/null
+    echo -e "/home"
+    $s find /home -xdev -mmin -10 -ls 2> /dev/null
+    echo -e "/root"
+    $s find /root -xdev -mmin -10 -ls 2> /dev/null
+    echo -e "/bin"
+    $s find /bin -xdev -mmin -10 -ls 2> /dev/null
+    echo -e "/sbin"
+    $s find /sbin -xdev -mmin -10 -ls 2> /dev/null
     sleep $t
 
     echo -e "\n------------------\n > Repositories <\n------------------ "

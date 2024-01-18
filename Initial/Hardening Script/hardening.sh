@@ -167,7 +167,7 @@ noIpv6(){
 maybeMalware(){
      apt-get purge -y john*
      apt-get purge -y netcat*
-     apt-get purge -y telnet*
+     #apt-get purge -y telnet*
      apt-get purge -y iodine*
      apt-get purge -y kismet*
      apt-get purge -y medusa*
@@ -188,7 +188,7 @@ maybeMalware(){
      apt-get purge -y knocker*
 	 apt-get purge -y openarena*
      apt-get purge -y openarena-server*
-     apt-get purge -y wireshark*
+     #apt-get purge -y wireshark*
      apt-get purge -y minetest*
      apt-get purge -y minetest-server*
      apt-get purge -y ophcrack*
@@ -210,14 +210,13 @@ maybeMalware(){
 	 apt-get purge -y postfix*
 	 apt-get purge -y ldp*
 	 apt purge john* -y
-	 apt purge nmap* -y
-	 apt purge wireshark* -y
+	 #apt purge nmap* -y
+	 #apt purge wireshark* -y
 	 apt purge metasploit* -y
 	 apt purge wesnoth* -y
 	 apt purge kismet* -y
 	 apt purge freeciv* -y
 	 apt purge zenmap* -y
-	 apt purge zenmap nmap* -y
 	 apt purge Minetest* -y
 	 apt purge minetest* -y
 	 apt purge knocker* -y
@@ -226,8 +225,8 @@ maybeMalware(){
 	 apt purge torrent* -y
 	 apt purge p0f -y
 	 apt purge tightvnc* -y
-	 apt purge postgresql* -y
-	 apt purge postgres* -y
+	 #apt purge postgresql* -y
+	 #apt purge postgres* -y
 	 apt purge ophcrack* -y
 	# apt purge crack* -y
 	 apt purge aircrack* -y
@@ -284,9 +283,9 @@ maybeMalware(){
 	sudo apt purge transmission-gtk -y
 	sudo apt purge utorrent* -y
 	sudo apt purge exim4* -y
-	sudo apt purge telnetd -y
+	#sudo apt purge telnetd -y
 	sudo apt purge crunch -y
-	sudo apt purge tcpdump -y
+	#sudo apt purge tcpdump -y
 	sudo apt purge tomcat -y
 	sudo apt purge tomcat6 -y
 	sudo apt purge vncserver* -y
@@ -296,7 +295,7 @@ maybeMalware(){
 	sudo apt purge vnc4server* -y
 	sudo apt purge nmdb -y
 	sudo apt purge dhclient -y
-	sudo apt purge telnet-server -y
+	#sudo apt purge telnet-server -y
 	sudo apt purge cryptcat* -y
 	sudo apt purge snort -y
 	sudo apt purge pryit -y
@@ -310,7 +309,7 @@ maybeMalware(){
 	sudo apt purge xprobe* -y
 	sudo apt purge openra* -y
 	sudo apt purge ipscan* -y
-	sudo apt-get remove python-scapy -y
+	#sudo apt-get remove python-scapy -y
 	sudo apt purge arp-scan* -y
 	sudo apt purge squid* -y
 	sudo apt purge heartbleeder* -y
@@ -330,9 +329,9 @@ maybeMalware(){
 deleteBad(){
     find / -name ".rhost" -exec rm -rf {} \;
     find / -name "host.equiv" -exec rm -rf {} \;
-    sudo find / -iname '*.xlsx' -delete
-	sudo find / -iname '*.shosts' -delete
-	sudo find / -iname '*.shosts.equiv' -delete
+    find / -iname '*.xlsx' -delete
+	find / -iname '*.shosts' -delete
+	find / -iname '*.shosts.equiv' -delete
 }
 
 perms(){
@@ -454,6 +453,44 @@ perms(){
     chown root:root /var/
 }
 
+fstab(){
+	echo "tmpfs /run/shm tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
+	echo "tmpfs /tmp tmpfs defaults,rw,nosuid,nodev,noexec,relatime 0 0" >> /etc/fstab
+	echo "tmpfs /var/tmp tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
+  	echo "proc /proc proc nosuid,nodev,noexec,hidepid=2,gid=proc 0 0" >> /etc/fstab
+}
+
+etcConf(){
+    echo "tty1" > /etc/securetty
+	echo "TMOUT=300" >> /etc/profile
+	echo "readonly TMOUT" >> /etc/profile
+	echo "export TMOUT" >> /etc/profile
+  	echo "declare -xr TMOUT=900" > /etc/profile.d/tmout.sh
+	echo "" > /etc/updatedb.conf
+	echo "blacklist usb-storage" >> /etc/modprobe.d/blacklist.conf
+	echo "install usb-storage /bin/false" > /etc/modprobe.d/usb-storage.conf
+    echo configs/auditd.conf > /etc/audit/auditd.conf
+  	echo configs/audit.rules > /etc/audit/audit.rules
+}
+
+dconfSettings(){
+    dconf reset -f /
+	gsettings set org.gnome.desktop.privacy remember-recent-files false
+	gsettings set org.gnome.desktop.media-handling automount false
+	gsettings set org.gnome.desktop.media-handling automount-open false
+	gsettings set org.gnome.desktop.search-providers disable-external true
+	dconf update /
+}
+
+other(){
+    echo 0 > /proc/sys/kernel/unprivileged_userns_clone
+    prelink -ua
+    apt-get remove -y prelink
+    
+}
+
+}
+
 chattr(){
     chattr +ia /etc/passwd
     chattr +ia /etc/group
@@ -475,7 +512,13 @@ kernel
 aliases
 configCmds
 noIpv6
+
+#everything below needs rhel capability (take from hivestorm)
 perms
+fstab
+etcConf
+dconfSettings
+other
 
 #last thing absolutely last
 chattr
