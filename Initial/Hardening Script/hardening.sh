@@ -168,6 +168,25 @@ noIpv6(){
     fi
 }
 
+cronConf(){
+    if [ "$os_type" == "RHEL" ]; then
+        cronConfs=$(stat -c "%U %n" /etc/cron*)
+        IFS=$'\n'
+        for ownerConf in $cronConfs; do
+            owner=$(echo "$ownerConf" | awk '{print $1}')
+            conf=$(echo "$ownerConf" | awk '{print $2}')
+            if [ "$owner" != "root" ]; then
+                echo "$owner owned $conf, setting owner to root"
+                chown root "$conf"
+            fi
+        done
+        IFS=$''
+    elif [ "$os_type" == "Ubuntu" ]; then
+        #ill do this shortly --hal
+    fi
+ 
+}
+
 maybeMalware(){
      apt-get purge -y john*
      apt-get purge -y netcat*
