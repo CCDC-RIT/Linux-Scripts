@@ -285,7 +285,7 @@ perms(){
     chown root:root /etc/fstab
     chown root:root /etc/updatedb.conf
     chown root:root /etc/modprobe.d/blacklist.conf
-    hown root:root /etc/environment
+    chown root:root /etc/environment
     chown root:root /boot/grub2/grub.cfg
     chown root:root /etc
     chown root:root /bin
