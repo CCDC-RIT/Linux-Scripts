@@ -363,8 +363,6 @@ other(){
     
 }
 
-}
-
 chattr(){
     chattr +ia /etc/passwd
     chattr +ia /etc/group
