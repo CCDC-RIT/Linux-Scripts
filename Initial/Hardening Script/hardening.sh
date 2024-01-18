@@ -178,6 +178,7 @@ cronConf(){
             if [ "$owner" != "root" ]; then
                 echo "$owner owned $conf, setting owner to root"
                 chown root "$conf"
+                chgrp root "$conf"
             fi
         done
         IFS=$''
