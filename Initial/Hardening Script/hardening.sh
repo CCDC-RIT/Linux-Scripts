@@ -190,6 +190,15 @@ noIpv6(){
     fi
 }
 
+chattr(){
+    chattr -ia /etc/passwd
+    chattr -ia /etc/group
+    chattr -ia /etc/shadow
+    chattr -ai /etc/passwd-
+    chattr -ia /etc/group-
+    chattr -ia /etc/shadow-
+}
+
 
 # main
 
@@ -202,6 +211,9 @@ kernel
 aliases
 configCmds
 noIpv6
+
+#last thing absolutely last
+chattr
 
 # add more here
 
