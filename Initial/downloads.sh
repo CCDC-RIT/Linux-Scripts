@@ -195,8 +195,8 @@ bash_rep() {
     # Install our own custom bashrc (bash config file) in case red team installed their own malicious one...
 
     echo "Replacing bashrc for new users and root..."
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /etc/skel/.bashrc
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /root/.bashrc
+    cp "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /etc/skel/.bashrc
+    cp "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /root/.bashrc
     echo "Replaced .bashrc"
 }
 
@@ -207,7 +207,7 @@ setup_honeypot() {
 
     echo "Downloading honeypot..."
     # Download and run the setup script
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/gouda.sh | sh
+    bash Linux-Scripts/Initial/gouda.sh
 
     # Don't actually install it into /etc/passwd as user hardening script will do that
     #sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
@@ -288,6 +288,33 @@ install_wazuh() {
     fi
 }
 
+nginx_setup() {
+    # If nginx appears to be installed, add our custom config file and restart it
+    if [[ -d "/etc/nginx/" ]]; then
+        # echo "Folder exists"
+        echo "Nginx install detected, adding custom config file!"
+
+        mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
+        cp Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf
+
+        # Restart service
+        if $DEBIAN || $UBUNTU || $REDHAT || $RHEL || $AMZ || $FEDORA; then
+            systemctl restart nginx
+            # There's some confusion as to use systemctl vs service...
+        elif $ALPINE ; then 
+            rc-service nginx restart
+        else
+            # Unknown OS. You can choose whether to just exit/do nothing with an error message, or to implement a custom fallback behavior.
+            echo "Unsupported or unknown OS detected for restarting nginx service automaticly: $OS_NAME"
+        fi
+
+        echo "Nginx config file installed, previous config file can be found at /etc/nginx/nginx.conf.backup!"
+    else
+        # echo "Folder does not exist"
+        echo "Nginx appears not to be installed (or not installed in the default location), nginx setup cancelled!"
+    fi
+}
+
 finish() {
     # At end, delete this file as there's no reason to keep it around
     # Shred is probably overkill
@@ -309,12 +336,17 @@ finish() {
 # Main code
 #################################################
 
+# Keep in mind chicken and the egg!
+# First we need OS detection (so that we can use right pkg manager)
+# Then common packages, then fetch all scripts, then everything that depends on repo (installing configs)
+# If you're running this script offline, comment out os detect, common pack, and fetch scripts (you will need Linux-Scripts repo folder in the same directory as this script!)
 setup_os_detection
 common_pack
-bash_rep
-setup_honeypot
 fetch_all_scripts
+setup_honeypot
+bash_rep
 install_wazuh
+nginx_setup
 
 echo "Downloads script complete!"
 
