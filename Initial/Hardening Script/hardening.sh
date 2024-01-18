@@ -146,21 +146,25 @@ noIpv6(){
             echo "Netplan configuration applied"
         fi
     elif [ $os_type == "RHEL" ]; then
-        sysctl="/etc/sysctl.conf"
-        if [ -e "$sysctl" ]; then
-            echo "using sysctl"
-            echo "net.ipv6.conf.all.disable_ipv6 = 1" >> "$sysctl"
-            echo "net.ipv6.conf.default.disable_ipv6 = 1" >> "$sysctl"
-            sysctl -p
-        fi
-        for interface in $interfaces; do
-            sysconfig="/etc/sysconfig/network-scripts/ifcfg-$interface"
-            if [ -e "$sysconfig" ]; then
-                echo -e "using $sysconfig"
-                echo "IPV6INIT=no" >> "$sysconfig"
+        if [ -e /etc/ida ]; then
+            echo "keep ipv6"
+        else
+            sysctl="/etc/sysctl.conf"
+            if [ -e "$sysctl" ]; then
+                echo "using sysctl"
+                echo "net.ipv6.conf.all.disable_ipv6 = 1" >> "$sysctl"
+                echo "net.ipv6.conf.default.disable_ipv6 = 1" >> "$sysctl"
+                sysctl -p
             fi
-        done
-        service network restart
+            for interface in $interfaces; do
+                sysconfig="/etc/sysconfig/network-scripts/ifcfg-$interface"
+                if [ -e "$sysconfig" ]; then
+                   echo -e "using $sysconfig"
+                    echo "IPV6INIT=no" >> "$sysconfig"
+                fi
+            done
+            service network restart
+        fi
     fi
 }
 
