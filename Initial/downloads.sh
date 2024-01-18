@@ -195,8 +195,8 @@ bash_rep() {
     # Install our own custom bashrc (bash config file) in case red team installed their own malicious one...
 
     echo "Replacing bashrc for new users and root..."
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /etc/skel/.bashrc
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/bashrc > /root/.bashrc
+    cp "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /etc/skel/.bashrc
+    cp "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /root/.bashrc
     echo "Replaced .bashrc"
 }
 
@@ -207,7 +207,7 @@ setup_honeypot() {
 
     echo "Downloading honeypot..."
     # Download and run the setup script
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/gouda.sh | sh
+    bash Linux-Scripts/Initial/gouda.sh
 
     # Don't actually install it into /etc/passwd as user hardening script will do that
     #sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
@@ -309,11 +309,15 @@ finish() {
 # Main code
 #################################################
 
+# Keep in mind chicken and the egg!
+# First we need OS detection (so that we can use right pkg manager)
+# Then common packages, then fetch all scripts, then everything that depends on repo (installing configs)
+# If you're running this script offline, comment out os detect, common pack, and fetch scripts (you will need Linux-Scripts repo folder in the same directory as this script!)
 setup_os_detection
 common_pack
-bash_rep
-setup_honeypot
 fetch_all_scripts
+setup_honeypot
+bash_rep
 install_wazuh
 
 echo "Downloads script complete!"
