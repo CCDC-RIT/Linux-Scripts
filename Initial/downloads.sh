@@ -169,7 +169,7 @@ setup_honeypot() {
 
     echo "Downloading honeypot..."
     # Download and run the setup script
-    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Uncategorized/gouda.sh | sh
+    curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Initial/gouda.sh | sh
 
     # Don't actually install it into /etc/passwd as user hardening script will do that
     #sed -i.bak 's|/bin/sh|/bin/redd|g' /etc/passwd
