@@ -170,9 +170,9 @@ noIpv6(){
 
 cronConf(){
     if [ "$os_type" == "RHEL" ]; then
-        cronConfs=$(stat -c "%U %n" /etc/cron*)
+        cronConfsOwners=$(stat -c "%U %n" /etc/cron*)
         IFS=$'\n'
-        for ownerConf in $cronConfs; do
+        for ownerConf in $cronConfsOwners; do
             owner=$(echo "$ownerConf" | awk '{print $1}')
             conf=$(echo "$ownerConf" | awk '{print $2}')
             if [ "$owner" != "root" ]; then
@@ -182,6 +182,7 @@ cronConf(){
             fi
         done
         IFS=$''
+        cronConfsPermissions=$()
     elif [ "$os_type" == "Ubuntu" ]; then
         #ill do this shortly --hal
     fi
