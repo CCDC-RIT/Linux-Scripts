@@ -10,6 +10,7 @@ backups() {
     dirs[etc]="/etc"
     dirs[www]="/var/www"
     dirs[lib]="/var/lib"
+    dirs[log]="/var/log"
     for i in "${dirs[@]}"; do
       for key in "${!dirs[@]}"; do
         if [ -d "$i" ] 
