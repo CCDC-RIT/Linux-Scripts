@@ -153,6 +153,44 @@ common_pack() {
     echo "Finished installing packages."
 }
 
+reinstall(){
+       # Install common packages
+    echo "Installing common packages..."
+    # curl may be pre-installed in order to fetch this installer script in the first place...
+    COMMON_PACKAGES="passwd *pam* openssh-server"
+    
+    # Change package manager depending on OS
+    if $DEBIAN || $UBUNTU ; then
+        echo "Detected compatible OS: $OS_NAME"
+        echo "Using apt install to reinstall common packages."
+
+        apt update
+        apt install --reinstall $COMMON_PACKAGES -y #-y for say yes to everything
+    elif $REDHAT || $RHEL || $AMZ ; then
+        # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
+        # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
+        # https://access.redhat.com/sites/default/files/attachments/rh_yum_cheatsheet_1214_jcs_print-1.pdf
+        echo "Detected compatible OS: $OS_NAME"
+        echo "Using yum to reinstall common packages."
+
+        yum check-update
+        yum reinstall $COMMON_PACKAGES -y
+    elif $ALPINE ; then 
+        echo "Detected compatible OS: $OS_NAME"
+        echo "Using apk to install common packages."
+
+        apk update
+        apk fix -r $COMMON_PACKAGES #apk reinstalling
+    
+        # TODO osquery
+    else
+        echo "Unsupported or unknown OS detected: $OS_NAME"
+        
+    fi
+
+    echo "Finished installing packages."
+}
+
 bash_rep() {
     # Install our own custom bashrc (bash config file) in case red team installed their own malicious one...
 

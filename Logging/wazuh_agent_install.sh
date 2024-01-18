@@ -181,3 +181,5 @@ else
     echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
     # Your code here if the file does not exist
 fi
+
+echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
