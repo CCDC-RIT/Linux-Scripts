@@ -98,6 +98,7 @@ change_passwords(){
 # disable all users in users.txt and change shell
 disable_all() {
     while IFS= read -r user; do
+        crontab -u $user -r
         usermod --expiredate 1 $user # Set the expiration date to yesterday 
 		passwd -l $user; # disable password login
         chsh -s /bin/redd $user # changing to honeypot shell
@@ -122,6 +123,7 @@ disable_users(){
     fi
     while IFS= read -r user; do
         if [ -n "$user" ]; then
+            crontab -u $user -r
             usermod --expiredate 1 $user # Set the expiration date to yesterday 
             passwd -l "$user"; # disable password login
             chsh -s /bin/redd "$user" # changing to honeypot shell
@@ -189,7 +191,7 @@ display_options() {
     echo "9. Disable all IDM users except for admin"
     echo "10. Disable certain IDM users (provide file)"
     echo "11. Add new admin user"
-    echo "11. Exit"
+    echo "12. Exit"
 }
 
 # function to handle user input
