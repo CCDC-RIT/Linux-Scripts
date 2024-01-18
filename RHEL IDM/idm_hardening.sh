@@ -8,6 +8,7 @@ echo $PASS|kinit admin #Get Kerberos ticket
 export HOSTNAME=$(hostname)
 #Disables anonymous LDAP binds from reading directory data while still allowing binds to root DSE information needed to get connection info:
 echo -e "dn: cn=config\nchangetype: modify\nreplace: nsslapd-allow-anonymous-access\nnsslapd-allow-anonymous-access: rootdse\n" | ldapmodify -x -D "cn=Directory Manager" -W -h $HOSTNAME -p 389 
-systemctl restart dirsrv.target #Restarts for changes to take effect
+ipa krbtpolicy-mod --maxlife=$((1*60*60)) --maxrenew=$((5*60*60)) #Change Kerberos global ticket policy time
+systemctl restart dirsrv.target #Restarts service for changes to take effect
 
 
