@@ -21,28 +21,6 @@ timestamp() {
 }
 
 basic(){
-    echo -e "\n-----------\n > System Overview <\n-----------"
-    echo -e "[OS]"
-    echo -n "OS Version     : "
-    cat /etc/os-release | grep "PRETTY_NAME" | grep -o "\".*.\"" | tr -d '"'
-    echo -n "Kernel Version : "
-    uname -r
-    echo -n "Hostname       : "
-    hostname
-  
-  
-    echo -e "\n-----------\n > Users <\n-----------"
-    $s getent passwd | grep -Ev '/nologin|/false' # Use Sed to clean this up
-    sleep $t
-
-    echo -e "\n------------\n > Groups <\n------------"
-    $s getent group | grep -v -E ":$"
-    sleep $t
-
-    echo -e "\n-------------\n > Sudoers <\n------------- "
-    cat /etc/sudoers | grep -v -E "^#.*"
-    sleep $t
-    
     echo -e "\n-------------\n > Aliases <\n------------- "
     alias
     sleep $t
