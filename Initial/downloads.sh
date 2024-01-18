@@ -62,7 +62,7 @@ common_pack() {
 
     echo "Installing common packages..."
     # curl may be pre-installed in order to fetch this installer script in the first place...
-    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav snoopy auditd"
+    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav snoopy auditd vlock"
     
     # Change package manager depending on OS
     if $DEBIAN || $UBUNTU ; then
