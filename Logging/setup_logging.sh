@@ -28,7 +28,7 @@ echo "Completes the 'Setup Logging' section of the linux quran"
 get_install_options() {
     read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
     read -p "Enter port number of Wazuh manager to connect to (Recommend 1514): " WAZUH_PORT < /dev/tty
-    read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
+    # read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
     read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
 }
 
@@ -51,7 +51,7 @@ wazuh_setup() {
         sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
         sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
         sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/g' /var/ossec/etc/ossec.conf
-        # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #TODO password
+        # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
 
         # Check if there are running Docker containers
         if docker ps -q 2>/dev/null; then
@@ -78,7 +78,7 @@ wazuh_setup() {
         sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
         sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
         sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/g' /var/ossec/etc/ossec.conf
-        # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #TODO password
+        # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
 
         # Check if there are running Docker containers
         if docker ps -q 2>/dev/null; then
