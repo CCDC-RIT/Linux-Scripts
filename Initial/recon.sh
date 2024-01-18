@@ -131,6 +131,8 @@ verbose(){
 
     echo -e "\n--------------------\n > Auth Backdoors <\n-------------------- "
     $s cat /etc/sudoers | grep NOPASS
+    $s cat /etc/sudoers | grep !AUTH
+    $s find / -type f \( -name ".rhosts" -o -name ".shosts" -o -name "hosts.equiv" \) -exec ls -l {} \;
     sleep $t
 
     echo -e "\n------------------------------\n > Files Modified Last 10Min <\n------------------------------ "
