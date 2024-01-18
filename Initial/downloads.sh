@@ -198,6 +198,47 @@ fetch_all_scripts() {
     #fi
 }
 
+install_wazuh() {
+    echo "Installing Wazuh"
+
+    # Change package manager depending on OS
+    if $DEBIAN || $UBUNTU ; then
+        echo "Detected compatible OS: $OS_NAME"
+        if $DEBIAN ; then
+            dpkg -i Linux-Scripts/Binaries/Wazuh/wazuh-agent_4.7.2-1_amd64_debian.deb
+        else
+            # Ubuntu!
+            dpkg -i Linux-Scripts/Binaries/Wazuh/wazuh-agent_4.7.2-1_amd64_ubuntu.deb
+        fi
+        # fix missing dependencies
+        apt-get install -f
+        # We'll handle setup in logging script...
+        echo "Wazuh installed from local binary repo of v4.7.2-1! Configuration not completed, this will be done in the logging setup script."
+    elif $REDHAT || $RHEL || $AMZ || $FEDORA ; then
+        # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
+        # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
+        # https://access.redhat.com/sites/default/files/attachments/rh_yum_cheatsheet_1214_jcs_print-1.pdf
+        echo "Detected compatible OS: $OS_NAME"
+        if $REDHAT || $RHEL ; then 
+            dnf install Linux-Scripts/Binaries/Wazuh/wazuh-agent-4.7.2-1.x86_64_rhel.rpm
+        elif $AMZ ; then
+            dnf install Linux-Scripts/Binaries/Wazuh/wazuh-agent-4.7.2-1.x86_64_amazon.rpm
+        elif $FEDORA ; then
+            dnf install Linux-Scripts/Binaries/Wazuh/wazuh-agent-4.7.2-1.x86_64_fedora.rpm
+        fi
+        # We'll handle setup in logging script...
+        echo "Wazuh installed from local binary repo of v4.7.2-1! Configuration not completed, this will be done in the logging setup script."
+    #elif $ALPINE ; then 
+        #no alpine for now because chatgpt thinks im talking about android and we're not using it anyways
+    #    echo "Detected compatible OS: $OS_NAME"
+    #
+        # We'll handle setup in logging script...
+    #    echo "Wazuh installed from local binary repo of v4.7.2-1! Configuration not completed, this will be done in the logging setup script."
+    else
+        echo "Unsupported or unknown OS detected: $OS_NAME"
+    fi
+}
+
 finish() {
     # At end, delete this file as there's no reason to keep it around
     # Shred is probably overkill
@@ -224,6 +265,7 @@ common_pack
 bash_rep
 setup_honeypot
 fetch_all_scripts
+install_wazuh
 
 echo "Downloads script complete!"
 
