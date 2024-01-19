@@ -20,6 +20,8 @@ change_ldap_manager_password(){
 
 idm_hardening(){
     export HOSTNAME=$(hostname)
+    read -s -p "Please enter current password for IDM Domain Admin: " PASS < /dev/tty
+    sleep 10
     echo $PASS|kinit admin #Get Kerberos ticket
     #Disables anonymous LDAP binds from reading directory data while still allowing binds to root DSE information needed to get connection info (using LDAPS):
     echo -e "dn: cn=config\nchangetype: modify\nreplace: nsslapd-allow-anonymous-access\nnsslapd-allow-anonymous-access: rootdse\n" | ldapmodify -x -D "cn=Directory Manager" -w $LDAP_PASS -H "ldaps://$HOSTNAME:636"
@@ -30,7 +32,7 @@ idm_hardening(){
 
 display_options() {
     echo "Menu:"
-    echo "1.Apply RHEL IdM Hardening Settings"
+    echo "1. Apply RHEL IdM Hardening Settings"
     echo "2. Change IdM Domain admin Password"
     echo "3. Change LDAP Directory Manager Password"
     echo "4. Do It All" #Does all of the other options
