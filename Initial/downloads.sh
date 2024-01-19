@@ -418,8 +418,8 @@ bash_rep() {
     # Install our own custom bashrc (bash config file) in case red team installed their own malicious one...
 
     echo "Replacing bashrc for new users and root..."
-    cp "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /etc/skel/.bashrc
-    cp "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /root/.bashrc
+    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /etc/skel/.bashrc
+    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /root/.bashrc
     echo "Replaced .bashrc"
 }
 
@@ -522,7 +522,7 @@ osquery_install() {
         # fix missing dependencies
         apt-get install -f
         # Install OSQUERY config file and start service
-        cp Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
+        cp -fr Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
         osqueryctl start osqueryd
 
         echo "Osquery installed from local binary repo of v5.11.0-1 and config file installed!"
@@ -534,7 +534,7 @@ osquery_install() {
         #uninstall old osquery (if present) first?
         dnf install Linux-Scripts/Binaries/osquery/osquery-5.11.0-1.linux.x86_64.rpm
         # Install OSQUERY config file and start service
-        cp Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
+        cp -fr Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
         osqueryctl start osqueryd
 
         echo "Osquery installed from local binary repo of v5.11.0-1 and config file installed!"
@@ -550,10 +550,10 @@ nginx_setup() {
         echo "Nginx install detected, adding custom config file!"
 
         mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-        cp Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf
-        cp Linux-Scripts/Proxy/proxy.conf /etc/nginx/conf.d/proxy.conf
-        cp Linux-Scripts/Proxy/fastcgi.conf /etc/nginx/fastcgi.conf
-        cp Linux-Scripts/Proxy/mime.conf /etc/nginx/mime.types
+        cp -fr Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf
+        cp -fr Linux-Scripts/Proxy/proxy.conf /etc/nginx/conf.d/proxy.conf
+        cp -fr Linux-Scripts/Proxy/fastcgi.conf /etc/nginx/fastcgi.conf
+        cp -fr Linux-Scripts/Proxy/mime.conf /etc/nginx/mime.types
 
         # Restart service
         if $DEBIAN || $UBUNTU || $REDHAT || $RHEL || $AMZ || $FEDORA; then
