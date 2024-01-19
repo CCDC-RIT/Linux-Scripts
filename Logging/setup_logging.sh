@@ -45,7 +45,7 @@ wazuh_setup() {
     # Config file stuff!
     mv /var/ossec/etc/local_internal_options.conf /var/ossec/etc/local_internal_options.conf.backup
     mv /var/ossec/etc/internal_options.conf /var/ossec/etc/internal_options.conf.backup
-    curl https://github.com/CCDC-RIT/Logging-Scripts/blob/main/internal_options.conf > /var/ossec/etc/internal_options.conf
+    curl https://raw.githubusercontent.com/CCDC-RIT/Logging-Scripts/main/internal_options.conf > /var/ossec/etc/internal_options.conf
     #Extra config option to enable remote commands for centralized config by jznn
     echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
 
