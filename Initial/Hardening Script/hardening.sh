@@ -449,22 +449,24 @@ chattr(){
 
 # main
 
+
+sed_ssh
 fix_corrupt
 reset_environment
-sed_ssh
 check_ssh_keys
 kernel
 aliases
 configCmds
 noIpv6
-
-#everything below needs rhel capability (take from hivestorm)
+cronConf
+accessModes
+maybeMalware
+deleteBad
 perms
 fstab
 etcConf
 dconfSettings
-other
-
+othe
 #last thing absolutely last
 chattr
 

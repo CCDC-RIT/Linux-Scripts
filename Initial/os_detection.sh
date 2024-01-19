@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ##############################################################################
 # Identifies the current OS and writes it to a file for later reference
 # See notes in os_detection_template.sh for how to reference this in your code
@@ -7,8 +9,6 @@
 # Issues:
 # Are these problematic variable names? i.e. DEBIAN might be an easily-confused variable
 # Only debian and ubuntu are tested afaik
-
-#!/bin/bash
 
 # check for root for installs and exit if not found
 if  [ "$EUID" -ne 0 ];

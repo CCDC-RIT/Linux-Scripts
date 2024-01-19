@@ -1,9 +1,9 @@
+#!/bin/bash
+
 #######################################################
 # Completes the 'setup logging' part of the Linux Quran
 # Reorganized by Guac0
 #######################################################
-
-#!/bin/bash
 
 # Import the OS variables
 # Needs os_detection.sh to run first

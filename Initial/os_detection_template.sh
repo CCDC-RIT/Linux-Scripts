@@ -1,10 +1,10 @@
+#!/bin/bash
+
 ##############################################################################
 # This is an example of how to use the results of os_detection.sh in your code
 # It will fail with an error message if the path of the os.txt file is wrong
 # Written by Guac0
 ##############################################################################
-
-#!/bin/bash
 
 # Import the OS variables
 # Needs os_detection.sh to run first
