@@ -64,13 +64,17 @@ common_pack() {
 
     echo "Installing common packages..."
     # curl may be pre-installed in order to fetch this installer script in the first place...
-    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav snoopy auditd vlock"
+    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav auditd vlock" #snoopy
     
     # Change package manager depending on OS
     if $DEBIAN || $UBUNTU ; then
         echo "Detected compatible OS: $OS_NAME"
         echo "Using apt install to install common packages."
 
+        # Set debconf answer for unattended installation
+        echo "postfix postfix/main_mailer_type select No configuration" | debconf-set-selections
+        # echo "snoopy <your-debconf-question> select Yes" | debconf-set-selections
+    
         apt update
         apt install $COMMON_PACKAGES -y #-y for say yes to everything
     elif $REDHAT || $RHEL || $AMZ ; then
