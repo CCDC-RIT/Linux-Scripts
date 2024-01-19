@@ -459,6 +459,8 @@ other(){
         systemctl mask ctrl-alt-del.target
         systemctl daemon-reload
     fi
+
+    systemctl start fail2ban
 }
 
 chattr(){
