@@ -39,56 +39,56 @@ wazuh_setup() {
         # uses apt and systemd
         echo "Detected compatible OS: $OS_NAME"
 
-        # Enable and start the Wazuh agent service
-        systemctl daemon-reload
-        systemctl enable wazuh-agent
-        systemctl start wazuh-agent
-
         # Install wazuh config file
-        VERSION=lsb_release -si
+        VERSION="lsb_release -si"
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
         cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
-        sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
-        sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
-        sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
-        sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/g' /var/ossec/etc/ossec.conf
+        sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/' /var/ossec/etc/ossec.conf
+        sed -i 's/1514/${WAZUH_PORT}/' /var/ossec/etc/ossec.conf
+        sed -i 's/[OS AND VERSION]/${VERSION}/' /var/ossec/etc/ossec.conf #TODO bad...
+        sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/' /var/ossec/etc/ossec.conf
         # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
 
         # Check if there are running Docker containers
         if docker ps -q 2>/dev/null; then
             # echo "There are running Docker containers."
-            sed -i 's/dockerchangeme/no/g' /var/ossec/etc/ossec.conf
+            sed -i 's/dockerchangeme/no/' /var/ossec/etc/ossec.conf
         else
             # echo "There are no running Docker containers."
-            sed -i 's/dockerchangeme/yes/g' /var/ossec/etc/ossec.conf
+            sed -i 's/dockerchangeme/yes/' /var/ossec/etc/ossec.conf
         fi
+
+        # Enable and start the Wazuh agent service
+        systemctl daemon-reload
+        systemctl enable wazuh-agent
+        systemctl start wazuh-agent
     elif $REDHAT || $RHEL || $AMZ ; then
         # uses yum and systemd
         echo "Detected compatible OS: $OS_NAME"
+
+        # Install wazuh config file
+        VERSION=lsb_release -si
+        #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
+        cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
+        sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/' /var/ossec/etc/ossec.conf
+        sed -i 's/1514/${WAZUH_PORT}/' /var/ossec/etc/ossec.conf
+        sed -i 's/[OS AND VERSION]/${VERSION}/' /var/ossec/etc/ossec.conf #TODO bad...
+        sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/' /var/ossec/etc/ossec.conf
+        # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
+
+        # Check if there are running Docker containers
+        if docker ps -q 2>/dev/null; then
+            # echo "There are running Docker containers."
+            sed -i 's/dockerchangeme/no/' /var/ossec/etc/ossec.conf
+        else
+            # echo "There are no running Docker containers."
+            sed -i 's/dockerchangeme/yes/' /var/ossec/etc/ossec.conf
+        fi
 
         # Enable and start the Wazuh agent service 
         systemctl daemon-reload
         systemctl enable wazuh-agent
         systemctl start wazuh-agent
-
-        # Install wazuh config file
-        VERSION=lsb_release -si
-        #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
-        cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
-        sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
-        sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
-        sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
-        sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/g' /var/ossec/etc/ossec.conf
-        # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
-
-        # Check if there are running Docker containers
-        if docker ps -q 2>/dev/null; then
-            # echo "There are running Docker containers."
-            sed -i 's/dockerchangeme/no/g' /var/ossec/etc/ossec.conf
-        else
-            # echo "There are no running Docker containers."
-            sed -i 's/dockerchangeme/yes/g' /var/ossec/etc/ossec.conf
-        fi
     elif $ALPINE ; then 
         # uses apk and none
         echo "Detected partially compatible OS: $OS_NAME"
