@@ -555,11 +555,20 @@ nginx_setup() {
         # echo "Folder exists"
         echo "Nginx install detected, adding custom config file!"
 
-        mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-        cp -fr Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf
+        # Main config file needs to be manually edited so dont install it
+        cp -fr Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf.rit_ccdc_template
+
+        # Make backups of these before importing new one
+        mv /etc/nginx/conf.d/proxy.conf /etc/nginx/conf.d/proxy.conf.backup
         cp -fr Linux-Scripts/Proxy/proxy.conf /etc/nginx/conf.d/proxy.conf
+        mv /etc/nginx/fastcgi.conf /etc/nginx/fastcgi.conf.backup
         cp -fr Linux-Scripts/Proxy/fastcgi.conf /etc/nginx/fastcgi.conf
+        mv /etc/nginx/mime.conf /etc/nginx/mime.conf.backup
         cp -fr Linux-Scripts/Proxy/mime.conf /etc/nginx/mime.types
+        mv /usr/share/nginx/run/nginx.pid /usr/share/nginx/run/nginx.pid.backup
+        cp -fr Linux-Scripts/Proxy/nginx.pid /usr/share/nginx/run/nginx.pid
+        mv /usr/share/nginx/logs/error.log /usr/share/nginx/logs/error.log.backup
+        cp -fr Linux-Scripts/Proxy/error.log /usr/share/nginx/logs/error.log
 
         # Restart service
         if $DEBIAN || $UBUNTU || $REDHAT || $RHEL || $AMZ || $FEDORA; then
