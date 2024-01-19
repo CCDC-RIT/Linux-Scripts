@@ -41,6 +41,14 @@ get_install_options() {
 wazuh_setup() {
     get_install_options
     # Do Wazuh, by Guac.0
+
+    # Config file stuff!
+    mv /var/ossec/etc/local_internal_options.conf /var/ossec/etc/local_internal_options.conf.backup
+    mv /var/ossec/etc/internal_options.conf /var/ossec/etc/internal_options.conf.backup
+    curl https://raw.githubusercontent.com/CCDC-RIT/Logging-Scripts/main/internal_options.conf > /var/ossec/etc/internal_options.conf
+    #Extra config option to enable remote commands for centralized config by jznn
+    echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
+
     if $DEBIAN || $UBUNTU ; then
         # uses apt and systemd
         echo "Detected compatible OS: $OS_NAME"
@@ -116,7 +124,7 @@ wazuh_setup() {
     # Filepath *should* be the same in all OSes according to docs
     # https://documentation.wazuh.com/current/user-manual/reference/statistics-files/wazuh-agentd-state.html
     echo "Waiting a couple seconds to receive acknowledgement from Wazuh manager..."
-    sleep 3 #wait a couple seconds for connection status to update
+    sleep 10 #wait a couple seconds for connection status to update
     filepath=/var/ossec/var/run/wazuh-agentd.state
     if [ -e "$filepath" ]; then
         # echo "File exists."
@@ -131,9 +139,6 @@ wazuh_setup() {
         echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
         # Your code here if the file does not exist
     fi
-
-    #Extra config option to enable remote commands for centralized config by jznn
-    echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
 }
 
 # I don't even know dawg - Guac0
@@ -143,9 +148,10 @@ random_old_stuff() {
     if $DEBIAN || $UBUNTU ; then #probably fine to also do if debian
         echo "Ubuntu/Debian Setup"
 
-        echo "Installing Snoopy..."
-        apt-get install snoopy -y
-        /usr/sbin/snoopy-enable
+        #echo "Installing Snoopy..."
+        #DEBIAN_FRONTEND=noninteractive apt-get install snoopy -y
+        #/usr/sbin/snoopy-enable
+        #Gotta do snoopy manually
         
         echo "Insatlling/Setting up auditd..."
         apt-get install auditd

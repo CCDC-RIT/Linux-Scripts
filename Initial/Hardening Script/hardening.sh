@@ -409,6 +409,11 @@ perms(){
     chown root:root /tmp
     chown root:root /usr
     chown root:root /var/
+    if [ "$os_type" == "RHEL"]; then
+        sed -i "s/^umask.*/umask 077/" "/etc/profile" 
+    elif [ "$os_type" == "Ubuntu"]
+        sed -i "s/^UMASK.*/UMASK 077/" "/etc/login.defs"
+    fi
 }
 
 fstab(){
@@ -445,6 +450,15 @@ other(){
     prelink -ua
     apt-get remove -y prelink
     
+    #remove ctrl alt delete
+    if [ "$os_type" == "RHEL" ]; then
+        systemctl disable --now ctrl-alt-del.target
+        systemctl mask --now ctrl-alt-del.target
+    elif [ "$os_type" == "Ubuntu" ]; then
+        systemctl disable ctrl-alt-del.target
+        systemctl mask ctrl-alt-del.target
+        systemctl daemon-reload
+    fi
 }
 
 chattr(){

@@ -5,7 +5,6 @@
 # Pre-condition: a file called users.txt exists in the same directory, with a list of users whose information should be changed (can be obtained by running getUsers.sh)
 # Additional pre-condition for RHEL IDM functionality: Valid Kerberos ticket (obtained by using the "kinit admin" command) and a file called idm_users.txt exists in the current directory, which can be created by running getIDMusers.sh or idm_usersAndGroups.sh
 
-# TODO: add RHEL IDM functionality
 # TODO: test run
 
 # print list of users to stdout
@@ -112,6 +111,7 @@ disable_all_idm() {
     #To-do: force Kerberos ticket expiry as existing connections remain valid until the ticket expires
     while IFS= read -r user; do
         if [ "$user" != "admin" ]; then
+            ipa user-mod $user --shell=/bin/redd #Changes default shell to honeypot
             ipa user-disable $user #Note: this user will still show up when retrieving users although it is disabled, as it has not been deleted. These users cannot authenticate and use any Kerberos services or do any tasks while the IDM account is disabled
         fi
 	done < idm_users.txt
@@ -142,6 +142,7 @@ disable_users_idm(){
     fi
     while IFS= read -r user; do
         if [ -n "$user" ]; then
+            ipa user-mod $user --shell=/bin/redd #Changes default shell to honeypot
             ipa user-disable $user
         fi
     done < "$user_file"
