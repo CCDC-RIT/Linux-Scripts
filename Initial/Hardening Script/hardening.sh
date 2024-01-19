@@ -110,6 +110,15 @@ kernel(){
         sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/&pti=on /' /etc/default/grub
         update-grub
     fi
+
+    #kernel profiling
+    
+
+    if [ "$os_type" == "RHEL" ]; then
+        
+    elif [ "$os_type" == "debian"]; then
+
+    fi
 }
 
 aliases(){
