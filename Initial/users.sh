@@ -50,7 +50,9 @@ change_all_idm()
     read -s -p "Please enter new password: " PASS < /dev/tty
 	echo "Setting passwords..."
 	while IFS= read -r user; do
-        echo -e "$PASS\n$PASS"|ipa user-mod $user --password #Pipes in the provided password to the password prompt
+        if [ "$user" != "admin" ]; then
+            echo -e "$PASS\n$PASS"|ipa user-mod $user --password #Pipes in the provided password to the password prompt
+        fi
 	done < idm_users.txt
     echo "Done."
 }

@@ -1,3 +1,5 @@
+# THIS IS DEPRECATED AND MOVED TO DOWNLOADS.SH
+
 ####################################################################
 # Resets sources.list to factory state in case of red team poisoning
 # Written by Guac.0
