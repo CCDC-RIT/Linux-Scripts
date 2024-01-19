@@ -21,13 +21,13 @@ change_ldap_manager_password(){
 idm_hardening(){
     export HOSTNAME=$(hostname)
     read -s -p "Please enter current password for IDM Domain Admin: " PASS < /dev/tty
-    sleep 8s
+    sleep 5s
     echo $PASS|kinit admin #Get Kerberos ticket
     #Disables anonymous LDAP binds from reading directory data while still allowing binds to root DSE information needed to get connection info (using LDAPS):
     echo -e "dn: cn=config\nchangetype: modify\nreplace: nsslapd-allow-anonymous-access\nnsslapd-allow-anonymous-access: rootdse\n" | ldapmodify -x -D "cn=Directory Manager" -w $LDAP_PASS -H "ldaps://$HOSTNAME:636"
     ipa krbtpolicy-mod --maxlife=$((1*60*60)) --maxrenew=$((5*60*60)) #Change Kerberos global ticket policy time (max life of 1 hour and max renew of 5 hours)
-    systemctl restart dirsrv.target #Restarts service for changes to take effect
-    service krb5kdc restart #restarts Kerberos for changes to take effect
+    echo $PASS|systemctl restart dirsrv.target #Restarts service for changes to take effect
+    echo $PASS|service krb5kdc restart #restarts Kerberos for changes to take effect
 }
 
 display_options() {
