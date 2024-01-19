@@ -112,12 +112,19 @@ kernel(){
     fi
 
     #kernel profiling
-    
-
+    kernelParanoid=$(sysctl kernel.perf_event_paranoid | awk '{print $3}')
     if [ "$os_type" == "RHEL" ]; then
-        
-    elif [ "$os_type" == "debian"]; then
+        if [ "$kernelParanoid" != "2"]
+            echo "$(sysctl kernel.perf_event_paranoid) should be set to 2, and will now be fixed"
+            
 
+        fi
+    elif [ "$os_type" == "debian"]; then
+        if [ "$kernelParanoid" != "2"]
+            echo "$(sysctl kernel.perf_event_paranoid) should be set to 4, and will now be fixed"
+
+
+        fi
     fi
 }
 

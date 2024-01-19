@@ -600,6 +600,7 @@ finish() {
 # First we need OS detection (so that we can use right pkg manager)
 # Then reset sources list (for security, but also might break things), reinstall common packages, then fetch all scripts, then everything that depends on repo (installing configs)
 # If you're running this script offline, comment out os detect, common pack, and fetch scripts (you will need Linux-Scripts repo folder in the same directory as this script!)
+apt install curl
 setup_os_detection
 sources_list_reset
 reinstall
