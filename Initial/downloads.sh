@@ -1,3 +1,4 @@
+#!/bin/bash
 # Created by Guac0 using code from vipersniper0501 for CCDC 2024
 
 # Objective:
@@ -20,7 +21,6 @@
 # General move from 5MinPlan.sh to this - done
 # Add inter-OS interdependency - done
 
-#!/bin/bash
 
 # check for root for installs and exit if not found
 if  [ "$EUID" -ne 0 ];
