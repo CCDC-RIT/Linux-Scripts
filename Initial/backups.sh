@@ -1,3 +1,5 @@
+#!/bin/bash
+
 backups() {
     # BACKUPS AUTHOR: Smash (https://github.com/smash8tap)
     # Make Secret Dir
