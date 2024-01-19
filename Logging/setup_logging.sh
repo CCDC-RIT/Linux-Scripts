@@ -145,21 +145,6 @@ random_old_stuff() {
         echo "Installing Snoopy..."
         apt-get install snoopy -y
         /usr/sbin/snoopy-enable
-
-        echo "Installing Filebeat..."
-        curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.5.2-amd64.deb
-        dpkg -i filebeat-7.5.2-amd64.deb
-        filebeat modules enable system
-        filebeat setup
-        systemctl start filebeat
-        echo "Some changes you might want to make to the /etc/filebeat/filebeat.yml
-    file.
-
-    output.elasticsearch:
-        hosts: [\"172.16.9.X:9200\"]
-    setup.kibana:
-        hosts: \"172.16.9.X:5601\"
-    "
         
         echo "Insatlling/Setting up auditd..."
         apt-get install auditd
