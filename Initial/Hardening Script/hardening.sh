@@ -58,6 +58,7 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?KerberosAuthentication.*/KerberosAuthentication no/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?MACs.*/MACs hmac-sha2-512,hmac-sha2-256/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?Ciphers.*/Ciphers aes256-ctr,aes192-ctr,aes128-ctr/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?KexAlgorithm.*/KexAlgorithm diffie-hellman-group14-sha256/g' /etc/ssh/sshd_config #this one might not work, got it from tenable not stig?
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM yes/g' /etc/ssh/sshd_config
     chown root /etc/ssh/sshd_config
