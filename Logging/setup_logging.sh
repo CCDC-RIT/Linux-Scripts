@@ -40,6 +40,14 @@ get_install_options() {
 wazuh_setup() {
     get_install_options
     # Do Wazuh, by Guac.0
+
+    # Config file stuff!
+    mv /var/ossec/etc/local_internal_options.conf /var/ossec/etc/local_internal_options.conf.backup
+    mv /var/ossec/etc/internal_options.conf /var/ossec/etc/internal_options.conf.backup
+    curl https://github.com/CCDC-RIT/Logging-Scripts/blob/main/internal_options.conf > /var/ossec/etc/internal_options.conf
+    #Extra config option to enable remote commands for centralized config by jznn
+    echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
+
     if $DEBIAN || $UBUNTU ; then
         # uses apt and systemd
         echo "Detected compatible OS: $OS_NAME"
@@ -130,9 +138,6 @@ wazuh_setup() {
         echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
         # Your code here if the file does not exist
     fi
-
-    #Extra config option to enable remote commands for centralized config by jznn
-    echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
 }
 
 # I don't even know dawg - Guac0
