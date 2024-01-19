@@ -24,3 +24,5 @@ backups() {
     done
     echo "Finished backups."
 }
+
+backups
