@@ -116,14 +116,14 @@ kernel(){
     if [ "$os_type" == "RHEL" ]; then
         if [ "$kernelParanoid" != "2"]
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 2, and will now be fixed"
-            
-
+            echo "kernel.perf_event_paranoid = 2" >> /etc/sysctl.d/99-sysctl.conf
+            sysctl -system
         fi
     elif [ "$os_type" == "debian"]; then
         if [ "$kernelParanoid" != "2"]
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 4, and will now be fixed"
-
-
+            echo "kernel.perf_event_paranoid = 4" >> /etc/sysctl.d/99-sysctl.conf
+            sysctl --system
         fi
     fi
 }
