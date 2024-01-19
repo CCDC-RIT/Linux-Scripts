@@ -465,7 +465,7 @@ chattr(){
     chattr +ia /etc/passwd
     chattr +ia /etc/group
     chattr +ia /etc/shadow
-    chattr +ai /etc/passwd-
+    chattr +ia /etc/passwd-
     chattr +ia /etc/group-
     chattr +ia /etc/shadow-
 }
