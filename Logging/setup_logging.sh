@@ -29,7 +29,8 @@ echo "Completes the 'Setup Logging' section of the linux quran"
 get_install_options() {
     # Instead of the read command, uncomment the below line (and comment the read line) to set the IP without prompting at cli
     # WAZUH_ADDRESS=10.0.0.1
-    read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
+    #read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
+    WAZUH_ADDRESS=$1
 
     # Old stuff
     # read -p "Enter port number of Wazuh manager to connect to (Recommend 1514): " WAZUH_PORT < /dev/tty

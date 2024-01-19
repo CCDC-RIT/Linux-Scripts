@@ -261,6 +261,11 @@ accessModes(){
         echo "$emergencySetting" >> "$emergencyFile"
     fi
     IFS=$'\n'
+
+    #no blank/null passwords
+    cp "/etc/pam.d/common-password" /tmp/common-password.bak
+    sed -i  '/nullok/d' "/etc/pam.d/common-password"
+    echo "nullok removed from common-password"
 }
 
 maybeMalware(){
