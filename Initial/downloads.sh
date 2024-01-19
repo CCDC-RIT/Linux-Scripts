@@ -59,7 +59,6 @@ unsupported_os() {
 common_pack() {
     # Install common packages
     #
-    # TODO Needs to be able to fix sources.list (red team can point to their own malicious sources)
     # TODO paranoia - what if some of these are already installed with bad/malicious configs? I don't think they get overwritten with the current settings...
 
     echo "Installing common packages..."
@@ -136,7 +135,7 @@ reinstall(){
     # Reinstall common essential packages
     echo "Reinstalling common essential packages..."
 
-    COMMON_PACKAGES="passwd *pam* openssh-server"
+    COMMON_PACKAGES="passwd openssh-server" # TODO *pam* 
     
     # Change package manager depending on OS
     if $DEBIAN || $UBUNTU ; then
