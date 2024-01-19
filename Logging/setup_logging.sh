@@ -33,6 +33,7 @@ get_install_options() {
 }
 
 wazuh_setup() {
+    get_install_options
     # Do Wazuh, by Guac.0
     if $DEBIAN || $UBUNTU ; then
         # uses apt and systemd
@@ -46,7 +47,7 @@ wazuh_setup() {
         # Install wazuh config file
         VERSION=lsb_release -si
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
-        cp -fr agent_linux.conf > /var/ossec/etc/ossec.conf
+        cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
         sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
         sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
         sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
@@ -73,7 +74,7 @@ wazuh_setup() {
         # Install wazuh config file
         VERSION=lsb_release -si
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
-        cp -fr agent_linux.conf > /var/ossec/etc/ossec.conf
+        cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
         sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
         sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
         sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
@@ -128,48 +129,51 @@ wazuh_setup() {
     echo "sca.remote_commands=1" >> /var/ossec/etc/local_internal_options.conf
 }
 
-# Snoopy
-# if [[ $distro == "Ubuntu" ]]; then
-if $DEBIAN || $UBUNTU ; then #probably fine to also do if debian
-    echo "Ubuntu/Debian Setup"
+# I don't even know dawg - Guac0
+random_old_stuff() {
+    # Snoopy
+    # if [[ $distro == "Ubuntu" ]]; then
+    if $DEBIAN || $UBUNTU ; then #probably fine to also do if debian
+        echo "Ubuntu/Debian Setup"
 
-    echo "Installing Snoopy..."
-    apt-get install snoopy -y
-    /usr/sbin/snoopy-enable
+        echo "Installing Snoopy..."
+        apt-get install snoopy -y
+        /usr/sbin/snoopy-enable
 
-    echo "Installing Filebeat..."
-    curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.5.2-amd64.deb
-    dpkg -i filebeat-7.5.2-amd64.deb
-    filebeat modules enable system
-    filebeat setup
-    systemctl start filebeat
-    echo "Some changes you might want to make to the /etc/filebeat/filebeat.yml
-file.
+        echo "Installing Filebeat..."
+        curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.5.2-amd64.deb
+        dpkg -i filebeat-7.5.2-amd64.deb
+        filebeat modules enable system
+        filebeat setup
+        systemctl start filebeat
+        echo "Some changes you might want to make to the /etc/filebeat/filebeat.yml
+    file.
 
-output.elasticsearch:
-    hosts: [\"172.16.9.X:9200\"]
-setup.kibana:
-    hosts: \"172.16.9.X:5601\"
-"
-    
-    echo "Insatlling/Setting up auditd..."
-    apt-get install auditd
+    output.elasticsearch:
+        hosts: [\"172.16.9.X:9200\"]
+    setup.kibana:
+        hosts: \"172.16.9.X:5601\"
+    "
+        
+        echo "Insatlling/Setting up auditd..."
+        apt-get install auditd
+        auditctl -D
+        echo "
     auditctl -D
-    echo "
-auditctl -D
-auditctl -a exit,always -F arch=b64 -F euid=0 -S execve -k ROOT_EXEC
-auditctl -a exit,always -F arch=b32 -F euid=0 -S execve -k ROOT_EXEC
-auditctl -a always,exit -F arch=b64 -S socket -F al=3 -k RAWSOCK
-auditctl -a always,exit -F arch=b32 -S socket -F al=3 -k RAWSOCK
-" | tee -a /opt/rules.sh > /dev/null
+    auditctl -a exit,always -F arch=b64 -F euid=0 -S execve -k ROOT_EXEC
+    auditctl -a exit,always -F arch=b32 -F euid=0 -S execve -k ROOT_EXEC
+    auditctl -a always,exit -F arch=b64 -S socket -F al=3 -k RAWSOCK
+    auditctl -a always,exit -F arch=b32 -S socket -F al=3 -k RAWSOCK
+    " | tee -a /opt/rules.sh > /dev/null
 
-    bash /opt/rules.sh
-    auditctl -e 2
+        bash /opt/rules.sh
+        auditctl -e 2
 
-    echo "Enabling Bash logging..."
-    export PROMPT_COMMAND='RT=$?; echo "$(date) $(whoami) <$SSH_CLIENT> [$$]: $(history 1) [$RT]" >> /var/log/.tmp-ICE'
-    chmod 666 /var/log/.tmp-ICE
-fi
+        echo "Enabling Bash logging..."
+        export PROMPT_COMMAND='RT=$?; echo "$(date) $(whoami) <$SSH_CLIENT> [$$]: $(history 1) [$RT]" >> /var/log/.tmp-ICE'
+        chmod 666 /var/log/.tmp-ICE
+    fi
+}
 
 # Don't have a working centos vm setup so not completing those steps right now.
 
@@ -178,3 +182,4 @@ fi
 ###############
 
 wazuh_setup
+random_old_stuff

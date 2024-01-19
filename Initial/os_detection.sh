@@ -8,6 +8,13 @@
 # Are these problematic variable names? i.e. DEBIAN might be an easily-confused variable
 # Only debian and ubuntu are tested afaik
 
+# check for root for installs and exit if not found
+if  [ "$EUID" -ne 0 ];
+then
+    echo "User is not root. Skill issue."
+    exit
+fi
+
 #OS variable storage
 osArray=(DEBIAN REDHAT ALPINE SLACK AMZ)
 

@@ -418,8 +418,8 @@ bash_rep() {
     # Install our own custom bashrc (bash config file) in case red team installed their own malicious one...
 
     echo "Replacing bashrc for new users and root..."
-    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /etc/skel/.bashrc
-    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" > /root/.bashrc
+    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" /etc/skel/.bashrc
+    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" /root/.bashrc
     echo "Replaced .bashrc"
 }
 
