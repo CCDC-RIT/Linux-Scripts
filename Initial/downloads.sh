@@ -20,6 +20,8 @@
 # General move from 5MinPlan.sh to this - done
 # Add inter-OS interdependency - done
 
+#!/bin/bash
+
 # check for root for installs and exit if not found
 if  [ "$EUID" -ne 0 ];
 then

@@ -4,6 +4,8 @@
 # Written by Guac0
 ##############################################################################
 
+#!/bin/bash
+
 # Import the OS variables
 # Needs os_detection.sh to run first
 PATH_TO_OS_RESULTS_FILE="./os.txt"

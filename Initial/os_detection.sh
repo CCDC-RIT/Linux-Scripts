@@ -8,6 +8,8 @@
 # Are these problematic variable names? i.e. DEBIAN might be an easily-confused variable
 # Only debian and ubuntu are tested afaik
 
+#!/bin/bash
+
 # check for root for installs and exit if not found
 if  [ "$EUID" -ne 0 ];
 then
