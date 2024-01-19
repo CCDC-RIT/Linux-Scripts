@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# by: Justin Huang (jznn)
+# by: Justin Huang (jznn), and Hal Williams (hfw8271)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
@@ -99,6 +99,33 @@ kernel(){
     echo "\n Resetting sysctl.conf file"
     cat configs/sysctl.conf > /etc/sysctl.conf
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
+
+    #kernel page-table isolation
+    if [ "$os_type" == "RHEL" ]; then
+        echo "setting kernel page-table isolation"
+        grubby --update-kernel=ALL --args="pti=on"
+        #the next line may or may not be needed, would be good to verify this is in the grub file when testing
+        #echo 'GRUB_CMDLINE_LINUX="pti=on"' >> /etc/default/grub
+    elif [ "$os_type" == "Ubuntu" ]; then
+        sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/&pti=on /' /etc/default/grub
+        update-grub
+    fi
+
+    #kernel profiling
+    kernelParanoid=$(sysctl kernel.perf_event_paranoid | awk '{print $3}')
+    if [ "$os_type" == "RHEL" ]; then
+        if [ "$kernelParanoid" != "2"]
+            echo "$(sysctl kernel.perf_event_paranoid) should be set to 2, and will now be fixed"
+            echo "kernel.perf_event_paranoid = 2" >> /etc/sysctl.d/99-sysctl.conf
+            sysctl -system
+        fi
+    elif [ "$os_type" == "debian"]; then
+        if [ "$kernelParanoid" != "2"]
+            echo "$(sysctl kernel.perf_event_paranoid) should be set to 4, and will now be fixed"
+            echo "kernel.perf_event_paranoid = 4" >> /etc/sysctl.d/99-sysctl.conf
+            sysctl --system
+        fi
+    fi
 }
 
 aliases(){
@@ -202,15 +229,54 @@ cronConf(){
     
 }
 
-maybeMalware(){
-    REMOVE = "john* netcat* iodine* kismet* medusa* hydra* fcrackzip* ayttm* empathy* nikto* logkeys* rdesktop* vinagre* openarena* openarena-server* minetest* minetest-server* ophcrack* crack* ldp* metasploit* wesnoth* freeciv* zenmap* knocker* bittorrent* torrent* p0f aircrack* aircrack-ng ettercap* irc* cl-irc* rsync* armagetron* postfix* nbtscan* cyphesis* endless-sky* hunt snmp* snmpd dsniff* lpd vino* netris* bestat* remmina netdiag inspircd* up.time uptimeagent chntpw* nfs* nfs-kernel-server* abc sqlmap acquisition bitcomet* bitlet* bitspirit* armitage airbase-ng* qbittorrent* ctorrent* ktorrent* rtorrent* deluge* tixati* frostwise vuse irssi transmission-gtk utorrent* exim4* crunch tomcat tomcat6 vncserver* tightvnc* tightvnc-common* tightvncserver* vnc4server* nmdb dhclient cryptcat* snort pryit gameconqueror* weplab lcrack dovecot* pop3 ember manaplus* xprobe* openra* ipscan* arp-scan* squid* heartbleeder* linuxdcpp* cmospwd* rfdump* cupp3* apparmor nis* ldap-utils prelink rsh-client rsh-redone-client* rsh-server" 
-    if [ "$os_type" = "RHEL" ]; then
-        yum remove $REMOVE -y 
+accessModes(){
+    #single user mode
+    singleFile="/usr/lib/systemd/system/rescue.service"
+    singleSetting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
+    singleMode=$(grep sulogin "$singleFile")
+    IFS=$'\n'
+    singleModeSet="False"
+    for line in "$singleMode"; do
+        if [ "$line" == "$singleSetting" ]; then
+            singleModeSet="True"
+        fi
+    done
+    if [ "$singleModeSet" == "False" ]; then
+        echo "setting single user mode authentication"
+        echo "$singleSetting" >> "$singleFile"
     fi
 
-    if [ "$os_type" = "Debian" ]; then
-        apt purge $REMOVE -y 
+    #Emergency mode
+    emergencyFile="/usr/lib/systemd/system/emergency.service"
+    emergencySetting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency"
+    emergencyMode=$(grep sulogin "$emergencyFile")
+    emergencyModeSet="False"
+    for line in "$emergencyMode"; do
+        if [ "$line" == "$emergencySetting" ]; then
+            emergencyModeSet="True"
+        fi
+    done
+    if [ "$emergencyModeSet" == "False" ]; then
+        echo "setting single user mode authentication"
+        echo "$emergencySetting" >> "$emergencyFile"
     fi
+    IFS=$'\n'
+}
+
+maybeMalware(){
+    REMOVE = "john* netcat* iodine* kismet* medusa* hydra* fcrackzip* ayttm* empathy* nikto* logkeys* rdesktop* vinagre* openarena* openarena-server* minetest* minetest-server* ophcrack* crack* ldp* metasploit* wesnoth* freeciv* zenmap* knocker* bittorrent* torrent* p0f aircrack* aircrack-ng ettercap* irc* cl-irc* rsync* armagetron* postfix* nbtscan* cyphesis* endless-sky* hunt snmp* snmpd dsniff* lpd vino* netris* bestat* remmina netdiag inspircd* up.time uptimeagent chntpw* nfs* nfs-kernel-server* abc sqlmap acquisition bitcomet* bitlet* bitspirit* armitage airbase-ng* qbittorrent* ctorrent* ktorrent* rtorrent* deluge* tixati* frostwise vuse irssi transmission-gtk utorrent* exim4* crunch tomcat tomcat6 vncserver* tightvnc* tightvnc-common* tightvncserver* vnc4server* nmdb dhclient cryptcat* snort pryit gameconqueror* weplab lcrack dovecot* pop3 ember manaplus* xprobe* openra* ipscan* arp-scan* squid* heartbleeder* linuxdcpp* cmospwd* rfdump* cupp3* apparmor nis* ldap-utils prelink rsh-client rsh-redone-client* rsh-server quagga" 
+    for package in $REMOVE; do
+        if [ "$os_type" = "RHEL" ]; then
+            removed=$(yum remove $package -y)
+        fi
+
+        if [ "$os_type" = "Debian" ]; then
+            removed=$(apt purge $package -y) 
+        fi
+        if [ "$removed" != "*0 to remove*"]; then
+            echo "$package was removed from the system"
+        fi 
+    done
 }
 
 deleteBad(){
@@ -388,22 +454,24 @@ chattr(){
 
 # main
 
+
+sed_ssh
 fix_corrupt
 reset_environment
-sed_ssh
 check_ssh_keys
 kernel
 aliases
 configCmds
 noIpv6
-
-#everything below needs rhel capability (take from hivestorm)
+cronConf
+accessModes
+maybeMalware
+deleteBad
 perms
 fstab
 etcConf
 dconfSettings
-other
-
+othe
 #last thing absolutely last
 chattr
 

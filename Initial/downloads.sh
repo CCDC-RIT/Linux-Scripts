@@ -1,3 +1,4 @@
+#!/bin/bash
 # Created by Guac0 using code from vipersniper0501 for CCDC 2024
 
 # Objective:
@@ -19,6 +20,7 @@
 # Download and install packages - done (well, the original ones given to me at least)
 # General move from 5MinPlan.sh to this - done
 # Add inter-OS interdependency - done
+
 
 # check for root for installs and exit if not found
 if  [ "$EUID" -ne 0 ];
@@ -62,13 +64,17 @@ common_pack() {
 
     echo "Installing common packages..."
     # curl may be pre-installed in order to fetch this installer script in the first place...
-    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav snoopy auditd vlock"
+    COMMON_PACKAGES="git curl vim tcpdump lynis net-tools tmux nmap fail2ban psad debsums clamav auditd vlock" #snoopy
     
     # Change package manager depending on OS
     if $DEBIAN || $UBUNTU ; then
         echo "Detected compatible OS: $OS_NAME"
         echo "Using apt install to install common packages."
 
+        # Set debconf answer for unattended installation
+        echo "postfix postfix/main_mailer_type select No configuration" | debconf-set-selections
+        # echo "snoopy <your-debconf-question> select Yes" | debconf-set-selections
+    
         apt update
         apt install $COMMON_PACKAGES -y #-y for say yes to everything
     elif $REDHAT || $RHEL || $AMZ ; then
@@ -418,8 +424,8 @@ bash_rep() {
     # Install our own custom bashrc (bash config file) in case red team installed their own malicious one...
 
     echo "Replacing bashrc for new users and root..."
-    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" /etc/skel/.bashrc
-    cp -fr "Linux-Scripts/Initial/bashrc/Hardening Script/configs/bashrc" /root/.bashrc
+    cp -fr "Linux-Scripts/Initial/Hardening Script/configs/bashrc" /etc/skel/.bashrc
+    cp -fr "Linux-Scripts/Initial/Hardening Script/configs/bashrc" /root/.bashrc
     echo "Replaced .bashrc"
 }
 
@@ -598,8 +604,9 @@ finish() {
 # First we need OS detection (so that we can use right pkg manager)
 # Then reset sources list (for security, but also might break things), reinstall common packages, then fetch all scripts, then everything that depends on repo (installing configs)
 # If you're running this script offline, comment out os detect, common pack, and fetch scripts (you will need Linux-Scripts repo folder in the same directory as this script!)
+apt install curl -y
 setup_os_detection
-sources_list_reset
+#sources_list_reset
 reinstall
 common_pack
 fetch_all_scripts

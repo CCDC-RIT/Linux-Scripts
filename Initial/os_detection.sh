@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ##############################################################################
 # Identifies the current OS and writes it to a file for later reference
 # See notes in os_detection_template.sh for how to reference this in your code

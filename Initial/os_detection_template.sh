@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ##############################################################################
 # This is an example of how to use the results of os_detection.sh in your code
 # It will fail with an error message if the path of the os.txt file is wrong
