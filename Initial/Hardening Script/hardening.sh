@@ -53,9 +53,11 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?UsePrivilegeSeparation.*/UsePrivilegeSeparation yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?ClientAliveCountMax.*/ClientAliveCountMax 1/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?ClientAliveInterval.*/ClientAliveInterval 600/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?Compression.*/Compression no/g' /etc/ssh/sshd_config #could also set to delayed stig says both work
+    sed -i.bak 's/.*\(#\)\?GSSAPIAuthentication.*/GSSAPIAuthentication no/g' /etc/ssh/sshd_config #chandi says this might break IDM??
+    sed -i.bak 's/.*\(#\)\?KerberosAuthentication.*/KerberosAuthentication no/g' /etc/ssh/sshd_config
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM yes/g' /etc/ssh/sshd_config
-
     chown root /etc/ssh/sshd_config
     chgrp root /etc/ssh/sshd_config
     chmod 0600 /etc/ssh/sshd_config
