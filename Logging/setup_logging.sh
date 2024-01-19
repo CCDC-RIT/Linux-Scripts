@@ -46,7 +46,7 @@ wazuh_setup() {
         # Install wazuh config file
         VERSION=lsb_release -si
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
-        cp -fr agent_linux.conf > /var/ossec/etc/ossec.conf
+        cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
         sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
         sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
         sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
@@ -73,7 +73,7 @@ wazuh_setup() {
         # Install wazuh config file
         VERSION=lsb_release -si
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
-        cp -fr agent_linux.conf > /var/ossec/etc/ossec.conf
+        cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
         sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/g' /var/ossec/etc/ossec.conf
         sed -i 's/1514/${WAZUH_PORT}/g' /var/ossec/etc/ossec.conf
         sed -i 's/[OS AND VERSION]/${VERSION}/g' /var/ossec/etc/ossec.conf #TODO bad...
