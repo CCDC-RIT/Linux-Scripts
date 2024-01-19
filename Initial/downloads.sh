@@ -602,7 +602,7 @@ finish() {
 # If you're running this script offline, comment out os detect, common pack, and fetch scripts (you will need Linux-Scripts repo folder in the same directory as this script!)
 apt install curl -y
 setup_os_detection
-sources_list_reset
+#sources_list_reset
 reinstall
 common_pack
 fetch_all_scripts
