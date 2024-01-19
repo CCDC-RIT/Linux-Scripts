@@ -409,6 +409,11 @@ perms(){
     chown root:root /tmp
     chown root:root /usr
     chown root:root /var/
+    if [ "$os_type" == "RHEL"]; then
+        sed -i "s/^umask.*/umask 077/" "/etc/profile" 
+    elif [ "$os_type" == "Ubuntu"]
+        sed -i "s/^UMASK.*/UMASK 077/" "/etc/login.defs"
+    fi
 }
 
 fstab(){
