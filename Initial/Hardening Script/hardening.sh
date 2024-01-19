@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# by: Justin Huang (jznn)
+# by: Justin Huang (jznn), and Hal Williams (hfw8271)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
@@ -99,6 +99,17 @@ kernel(){
     echo "\n Resetting sysctl.conf file"
     cat configs/sysctl.conf > /etc/sysctl.conf
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
+
+    #kernel page-table isolation
+    if [ "$os_type" == "RHEL" ]; then
+        echo "setting kernel page-table isolation"
+        grubby --update-kernel=ALL --args="pti=on"
+        #the next line may or may not be needed, would be good to verify this is in the grub file when testing
+        #echo 'GRUB_CMDLINE_LINUX="pti=on"' >> /etc/default/grub
+    elif [ "$os_type" == "Ubuntu" ]; then
+        sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/&pti=on /' /etc/default/grub
+        update-grub
+    fi
 }
 
 aliases(){
