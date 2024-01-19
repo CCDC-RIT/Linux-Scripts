@@ -110,6 +110,8 @@ wazuh_setup() {
 
     # Filepath *should* be the same in all OSes according to docs
     # https://documentation.wazuh.com/current/user-manual/reference/statistics-files/wazuh-agentd-state.html
+    echo "Waiting a couple seconds to receive acknowledgement from Wazuh manager..."
+    sleep 3 #wait a couple seconds for connection status to update
     filepath=/var/ossec/var/run/wazuh-agentd.state
     if [ -e "$filepath" ]; then
         # echo "File exists."
