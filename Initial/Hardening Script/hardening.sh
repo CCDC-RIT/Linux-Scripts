@@ -50,6 +50,7 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?PrintLastLog.*/PrintLastLog yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?TCPKeepAlive.*/TCPKeepAlive yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UseLogin.*/UseLogin yes/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?UsePrivilegeSeparation.*/UsePrivilegeSeparation yes/g' /etc/ssh/sshd_config
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM yes/g' /etc/ssh/sshd_config
     echo "Edited sshd_config, ssh service restarting"
