@@ -71,17 +71,6 @@ common_pack() {
 
         apt update
         apt install $COMMON_PACKAGES -y #-y for say yes to everything
-
-        # OSQUERY custom stuff because yay custom repo
-        # https://osquery.io/downloads/official/5.11.0
-        # fix for install error: https://github.com/osquery/osquery/issues/8105 
-        curl -fsSL  https://pkg.osquery.io/deb/pubkey.gpg | gpg --dearmor -o /etc/apt/keyrings/osquery.gpg
-        echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/osquery.gpg] https://pkg.osquery.io/deb deb main" | tee /etc/apt/sources.list.d/osquery.list > /dev/null
-        apt update
-        apt install osquery
-
-        # Install OSQUERY config file
-        curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/osquery.conf > /etc/osquery/osquery.conf
     elif $REDHAT || $RHEL || $AMZ ; then
         # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
         # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
@@ -91,32 +80,18 @@ common_pack() {
 
         yum check-update
         yum install $COMMON_PACKAGES -y
-
-        # OSQUERY custom stuff because yay custom repo
-        # https://osquery.io/downloads/official/5.11.0
-        curl -L https://pkg.osquery.io/rpm/GPG | tee /etc/pki/rpm-gpg/RPM-GPG-KEY-osquery
-        yum-config-manager --add-repo https://pkg.osquery.io/rpm/osquery-s3-rpm.repo
-        yum-config-manager --enable osquery-s3-rpm-repo
-        yum install osquery
-
-        # Install OSQUERY config file
-        curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/osquery.conf > /etc/osquery/osquery.conf
     elif $ALPINE ; then 
         echo "Detected compatible OS: $OS_NAME"
         echo "Using apk to install common packages."
 
         apk update
         apk add $COMMON_PACKAGES #apk automatically has equivalent -y functionality
-    
-        # TODO osquery
     elif $SLACK ; then 
         echo "Detected compatible OS: $OS_NAME"
         echo "Using slapt-get to install common packages."
 
         #slapt-get update #Not a thing for slapt-get
         slapt-get --install $COMMON_PACKAGES
-
-        #TODO osquery
     else
         echo "Unsupported or unknown OS detected: $OS_NAME"
         #read -p "Please enter the command to update the package manager's list of available packages (such as 'apt update'): " PKG_UPDATE < /dev/tty
@@ -146,8 +121,6 @@ common_pack() {
         #        $PKG_INSTALL $COMMON_PACKAGE
         #    fi
         # fi
-
-        #TODO osquery
     fi
 
     echo "Finished installing packages."
@@ -538,6 +511,38 @@ install_wazuh() {
     fi
 }
 
+osquery_install() {
+    echo "Installing Osquery"
+
+    # Change package manager depending on OS
+    if $DEBIAN || $UBUNTU ; then
+        echo "Detected compatible OS: $OS_NAME"
+        #uninstall old osquery (if present) first?
+        dpkg -i Linux-Scripts/Binaries/osquery/osquery_5.11.0-1.linux_amd64.deb
+        # fix missing dependencies
+        apt-get install -f
+        # Install OSQUERY config file and start service
+        cp Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
+        osqueryctl start osqueryd
+
+        echo "Osquery installed from local binary repo of v5.11.0-1 and config file installed!"
+    elif $REDHAT || $RHEL || $AMZ || $FEDORA ; then
+        # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
+        # yum rundown: https://www.reddit.com/r/redhat/comments/837g3v/red_hat_update_commands/ 
+        # https://access.redhat.com/sites/default/files/attachments/rh_yum_cheatsheet_1214_jcs_print-1.pdf
+        echo "Detected compatible OS: $OS_NAME"
+        #uninstall old osquery (if present) first?
+        dnf install Linux-Scripts/Binaries/osquery/osquery-5.11.0-1.linux.x86_64.rpm
+        # Install OSQUERY config file and start service
+        cp Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
+        osqueryctl start osqueryd
+
+        echo "Osquery installed from local binary repo of v5.11.0-1 and config file installed!"
+    else
+        echo "Unsupported or unknown OS detected: $OS_NAME"
+    fi
+}
+
 nginx_setup() {
     # If nginx appears to be installed, add our custom config file and restart it
     if [[ -d "/etc/nginx/" ]]; then
@@ -602,6 +607,7 @@ setup_honeypot
 bash_rep
 install_wazuh
 nginx_setup
+osquery_install
 
 echo "Downloads script complete!"
 
