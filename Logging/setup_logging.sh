@@ -148,9 +148,10 @@ random_old_stuff() {
     if $DEBIAN || $UBUNTU ; then #probably fine to also do if debian
         echo "Ubuntu/Debian Setup"
 
-        echo "Installing Snoopy..."
-        apt-get install snoopy -y
-        /usr/sbin/snoopy-enable
+        #echo "Installing Snoopy..."
+        #DEBIAN_FRONTEND=noninteractive apt-get install snoopy -y
+        #/usr/sbin/snoopy-enable
+        #Gotta do snoopy manually
         
         echo "Insatlling/Setting up auditd..."
         apt-get install auditd
