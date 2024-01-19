@@ -51,6 +51,8 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?TCPKeepAlive.*/TCPKeepAlive yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UseLogin.*/UseLogin yes/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePrivilegeSeparation.*/UsePrivilegeSeparation yes/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?ClientAliveCountMax.*/ClientAliveCountMax 1/g' /etc/ssh/sshd_config
+    sed -i.bak 's/.*\(#\)\?ClientAliveInterval.*/ClientAliveInterval 600/g' /etc/ssh/sshd_config
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM yes/g' /etc/ssh/sshd_config
 
