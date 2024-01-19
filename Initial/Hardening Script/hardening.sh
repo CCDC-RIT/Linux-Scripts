@@ -445,6 +445,15 @@ other(){
     prelink -ua
     apt-get remove -y prelink
     
+    #remove ctrl alt delete
+    if [ "$os_type" == "RHEL" ]; then
+        systemctl disable --now ctrl-alt-del.target
+        systemctl mask --now ctrl-alt-del.target
+    elif [ "$os_type" == "Ubuntu" ]; then
+        systemctl disable ctrl-alt-del.target
+        systemctl mask ctrl-alt-del.target
+        systemctl daemon-reload
+    fi
 }
 
 chattr(){
