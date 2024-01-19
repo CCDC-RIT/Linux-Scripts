@@ -1,9 +1,10 @@
 #!/bin/bash
 
-#######################################################
+###################################################################
 # Completes the 'setup logging' part of the Linux Quran
+# For unattended install, search for WAZUH_ADDRESS= and see note
 # Reorganized by Guac0
-#######################################################
+###################################################################
 
 # Import the OS variables
 # Needs os_detection.sh to run first
@@ -26,10 +27,14 @@ fi
 echo "Completes the 'Setup Logging' section of the linux quran"
 
 get_install_options() {
+    # Instead of the read command, uncomment the below line (and comment the read line) to set the IP without prompting at cli
+    # WAZUH_ADDRESS=10.0.0.1
     read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
-    read -p "Enter port number of Wazuh manager to connect to (Recommend 1514): " WAZUH_PORT < /dev/tty
+
+    # Old stuff
+    # read -p "Enter port number of Wazuh manager to connect to (Recommend 1514): " WAZUH_PORT < /dev/tty
     # read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
-    read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
+    # read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
 }
 
 wazuh_setup() {
@@ -41,11 +46,12 @@ wazuh_setup() {
 
         # Install wazuh config file
         VERSION=$(lsb_release -si)
-        #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
+        # curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
         cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
         sed -i "s/\[MANAGER_IP\]/${WAZUH_ADDRESS}/" /var/ossec/etc/ossec.conf
-        #sed -i "s/1514/${WAZUH_PORT}/" /var/ossec/etc/ossec.conf
-        sed -i "s/\[OS AND VERSION\]/${VERSION}/" /var/ossec/etc/ossec.conf
+        # sed -i "s/1514/${WAZUH_PORT}/" /var/ossec/etc/ossec.conf
+        sed -i "s/\[OS AND VERSION\]/${VERSION}/" /var/ossec/etc/ossec.conf #TODO not a great way to do this...
+        # sed -i "s|<groups>default</groups>|<groups>linux</groups>|" /var/ossec/etc/ossec.conf
         # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
 
         # Check if there are running Docker containers
@@ -108,6 +114,8 @@ wazuh_setup() {
 
     # Filepath *should* be the same in all OSes according to docs
     # https://documentation.wazuh.com/current/user-manual/reference/statistics-files/wazuh-agentd-state.html
+    echo "Waiting a couple seconds to receive acknowledgement from Wazuh manager..."
+    sleep 3 #wait a couple seconds for connection status to update
     filepath=/var/ossec/var/run/wazuh-agentd.state
     if [ -e "$filepath" ]; then
         # echo "File exists."
