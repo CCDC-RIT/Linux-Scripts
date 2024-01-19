@@ -40,13 +40,13 @@ wazuh_setup() {
         echo "Detected compatible OS: $OS_NAME"
 
         # Install wazuh config file
-        VERSION="lsb_release -si"
+        VERSION=$(lsb_release -si)
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
         cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
-        sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/' /var/ossec/etc/ossec.conf
-        sed -i 's/1514/${WAZUH_PORT}/' /var/ossec/etc/ossec.conf
-        sed -i 's/[OS AND VERSION]/${VERSION}/' /var/ossec/etc/ossec.conf #TODO bad...
-        sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/' /var/ossec/etc/ossec.conf
+        sed -i "s/\[MANAGER_IP\]/${WAZUH_ADDRESS}/" /var/ossec/etc/ossec.conf
+        sed -i "s/1514/${WAZUH_PORT}/" /var/ossec/etc/ossec.conf
+        sed -i "s/\[OS AND VERSION\]/${VERSION}/" /var/ossec/etc/ossec.conf
+        sed -i "s|<groups>default</groups>|<groups>${WAZUH_GROUP}</groups>|" /var/ossec/etc/ossec.conf
         # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
 
         # Check if there are running Docker containers
@@ -67,13 +67,13 @@ wazuh_setup() {
         echo "Detected compatible OS: $OS_NAME"
 
         # Install wazuh config file
-        VERSION=lsb_release -si
+        VERSION=$(lsb_release -si)
         #curl https://raw.githubusercontent.com/CCDC-RIT/Linux-Scripts/main/Logging/agent_linux.conf > /var/ossec/etc/ossec.conf
         cp -fr agent_linux.conf /var/ossec/etc/ossec.conf
-        sed -i 's/[MANAGER_IP]/${WAZUH_ADDRESS}/' /var/ossec/etc/ossec.conf
-        sed -i 's/1514/${WAZUH_PORT}/' /var/ossec/etc/ossec.conf
-        sed -i 's/[OS AND VERSION]/${VERSION}/' /var/ossec/etc/ossec.conf #TODO bad...
-        sed -i 's/<groups>default</groups>/<groups>${WAZUH_GROUP}</groups>/' /var/ossec/etc/ossec.conf
+        sed -i "s/\[MANAGER_IP\]/${WAZUH_ADDRESS}/" /var/ossec/etc/ossec.conf
+        sed -i "s/1514/${WAZUH_PORT}/" /var/ossec/etc/ossec.conf
+        sed -i "s/\[OS AND VERSION\]/${VERSION}/" /var/ossec/etc/ossec.conf
+        sed -i "s|<groups>default</groups>|<groups>${WAZUH_GROUP}</groups>|" /var/ossec/etc/ossec.conf
         # sed -i 's/<authorization_pass_path>etc/authd.pass</authorization_pass_path>/<authorization_pass_path>new-text</authorization_pass_path>/g' /var/ossec/etc/ossec.conf #password is broken but we dont need to add it anyways, WINNING
 
         # Check if there are running Docker containers
