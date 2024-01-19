@@ -213,6 +213,27 @@ cronConf(){
     
 }
 
+accessModes(){
+    #single user mode
+    file="/usr/lib/systemd/system/rescue.service"
+    setting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
+    singleMode=$(grep sulogin "$file")
+    IFS=$'\n'
+    singleModeSet="False"
+    for line in "$singleMode"; do
+        if [ "$line" == "$setting" ]; then
+            singleModeSet="True"
+        fi
+    done
+    if [ "$singleModeSet" == "False" ]; then
+        echo "setting single user mode authentication"
+        echo "$setting" >> "$file"
+    fi
+
+    #Emergency mode
+
+}
+
 maybeMalware(){
     REMOVE = "john* netcat* iodine* kismet* medusa* hydra* fcrackzip* ayttm* empathy* nikto* logkeys* rdesktop* vinagre* openarena* openarena-server* minetest* minetest-server* ophcrack* crack* ldp* metasploit* wesnoth* freeciv* zenmap* knocker* bittorrent* torrent* p0f aircrack* aircrack-ng ettercap* irc* cl-irc* rsync* armagetron* postfix* nbtscan* cyphesis* endless-sky* hunt snmp* snmpd dsniff* lpd vino* netris* bestat* remmina netdiag inspircd* up.time uptimeagent chntpw* nfs* nfs-kernel-server* abc sqlmap acquisition bitcomet* bitlet* bitspirit* armitage airbase-ng* qbittorrent* ctorrent* ktorrent* rtorrent* deluge* tixati* frostwise vuse irssi transmission-gtk utorrent* exim4* crunch tomcat tomcat6 vncserver* tightvnc* tightvnc-common* tightvncserver* vnc4server* nmdb dhclient cryptcat* snort pryit gameconqueror* weplab lcrack dovecot* pop3 ember manaplus* xprobe* openra* ipscan* arp-scan* squid* heartbleeder* linuxdcpp* cmospwd* rfdump* cupp3* apparmor nis* ldap-utils prelink rsh-client rsh-redone-client* rsh-server" 
     if [ "$os_type" = "RHEL" ]; then
