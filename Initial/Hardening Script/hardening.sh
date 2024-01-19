@@ -215,23 +215,36 @@ cronConf(){
 
 accessModes(){
     #single user mode
-    file="/usr/lib/systemd/system/rescue.service"
-    setting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
-    singleMode=$(grep sulogin "$file")
+    singleFile="/usr/lib/systemd/system/rescue.service"
+    singleSetting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
+    singleMode=$(grep sulogin "$singleFile")
     IFS=$'\n'
     singleModeSet="False"
     for line in "$singleMode"; do
-        if [ "$line" == "$setting" ]; then
+        if [ "$line" == "$singleSetting" ]; then
             singleModeSet="True"
         fi
     done
     if [ "$singleModeSet" == "False" ]; then
         echo "setting single user mode authentication"
-        echo "$setting" >> "$file"
+        echo "$singleSetting" >> "$singleFile"
     fi
 
     #Emergency mode
-
+    emergencyFile="/usr/lib/systemd/system/emergency.service"
+    emergencySetting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency"
+    emergencyMode=$(grep sulogin "$emergencyFile")
+    emergencyModeSet="False"
+    for line in "$emergencyMode"; do
+        if [ "$line" == "$emergencySetting" ]; then
+            emergencyModeSet="True"
+        fi
+    done
+    if [ "$emergencyModeSet" == "False" ]; then
+        echo "setting single user mode authentication"
+        echo "$emergencySetting" >> "$emergencyFile"
+    fi
+    IFS=$'\n'
 }
 
 maybeMalware(){
