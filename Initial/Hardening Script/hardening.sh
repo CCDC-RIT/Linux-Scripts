@@ -53,6 +53,10 @@ sed_ssh() {
     sed -i.bak 's/.*\(#\)\?UsePrivilegeSeparation.*/UsePrivilegeSeparation yes/g' /etc/ssh/sshd_config
     sed -i.bak '/Subsystem sftp/d' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePAM.*/UsePAM yes/g' /etc/ssh/sshd_config
+
+    chown root /etc/ssh/sshd_config
+    chgrp root /etc/ssh/sshd_config
+    chmod 0600 /etc/ssh/sshd_config
     echo "Edited sshd_config, ssh service restarting"
     systemctl restart ssh
 }
