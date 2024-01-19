@@ -11,7 +11,6 @@ backups() {
     declare -A dirs
     dirs[etc]="/etc"
     dirs[www]="/var/www"
-    dirs[lib]="/var/lib"
     dirs[log]="/var/log"
 
     for key in "${!dirs[@]}"; do
