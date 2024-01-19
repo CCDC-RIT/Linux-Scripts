@@ -546,6 +546,9 @@ nginx_setup() {
 
         mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
         cp Linux-Scripts/Proxy/nginx.conf /etc/nginx/nginx.conf
+        cp Linux-Scripts/Proxy/proxy.conf /etc/nginx/conf.d/proxy.conf
+        cp Linux-Scripts/Proxy/fastcgi.conf /etc/nginx/fastcgi.conf
+        cp Linux-Scripts/Proxy/mime.conf /etc/nginx/mime.types
 
         # Restart service
         if $DEBIAN || $UBUNTU || $REDHAT || $RHEL || $AMZ || $FEDORA; then
