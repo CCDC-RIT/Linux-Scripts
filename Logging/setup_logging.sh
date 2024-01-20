@@ -26,9 +26,9 @@ fi
 
 echo "Completes the 'Setup Logging' section of the linux quran"
 
-WAZUH_ADDRESS=$1
+WAZUH_ADDRESS="$1"
 
-get_install_options() {
+#get_install_options() {
     # Instead of the read command, uncomment the below line (and comment the read line) to set the IP without prompting at cli
     # WAZUH_ADDRESS=10.0.0.1
     #read -p "Enter IPv4 address of Wazuh manager to connect to: " WAZUH_ADDRESS < /dev/tty
@@ -37,10 +37,10 @@ get_install_options() {
     # read -p "Enter port number of Wazuh manager to connect to (Recommend 1514): " WAZUH_PORT < /dev/tty
     # read -p -s "Enter password for Wazuh manager registration: " WAZUH_PASSWORD < /dev/tty
     # read -p "Enter group name to enroll with at the Wazuh manager: " WAZUH_GROUP < /dev/tty
-}
+#}
 
 wazuh_setup() {
-    get_install_options
+    #get_install_options
     # Do Wazuh, by Guac.0
 
     # Config file stuff!
