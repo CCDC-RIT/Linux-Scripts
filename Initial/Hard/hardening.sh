@@ -455,7 +455,7 @@ passwordPolicy(){
         cp configs/password-auth.txt /etc/pam.d/password-auth
     elif [ "$os_type" == "Ubuntu" ]; then
         cp configs/common-auth.txt /etc/pam.d/common-auth
-        cp configs/common-password.txt /etc/common-password
+        cp configs/common-password.txt /etc/pam.d/common-password
     fi    
 }
 
