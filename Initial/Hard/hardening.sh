@@ -114,13 +114,13 @@ kernel(){
     #kernel profiling
     kernelParanoid=$(sysctl kernel.perf_event_paranoid | awk '{print $3}')
     if [ "$os_type" == "RHEL" ]; then
-        if [ "$kernelParanoid" != "2"]; then
+        if [ "$kernelParanoid" != "2" ]; then
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 2, and will now be fixed"
             echo "kernel.perf_event_paranoid = 2" >> /etc/sysctl.d/99-sysctl.conf
             sysctl -system
         fi
-    elif [ "$os_type" == "debian"]; then
-        if [ "$kernelParanoid" != "2"]; then
+    elif [ "$os_type" == "debian" ]; then
+        if [ "$kernelParanoid" != "2" ]; then
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 4, and will now be fixed"
             echo "kernel.perf_event_paranoid = 4" >> /etc/sysctl.d/99-sysctl.conf
             sysctl --system
@@ -278,7 +278,7 @@ maybeMalware(){
         if [ "$os_type" == "Debian" ]; then
             removed=$(apt purge $package -y) 
         fi
-        if [ "$removed" != "*0 to remove*" || "$removed" != "*Nothing to do*"]; then
+        if [ "$removed" != "*0 to remove*" || "$removed" != "*Nothing to do*" ]; then
             echo "$package was removed from the system"
         fi 
     done
@@ -311,9 +311,11 @@ perms(){
     chmod 644 /etc/sysctl.conf
     chmod 644 /proc/sys/net/ipv4/ip_forward
     chmod 644 /etc/passwd
+    chmod 644 /etc/passwd-
     chmod 640 /etc/shadow
     chmod 644 /etc/group
-    chmod 640 /etc/gshadow
+    chmod 644 /etc/group-
+    chmod 000 /etc/gshadow
     chmod 755 /etc/sudoers.d/
     chmod 440 /etc/sudoers.d/*
     chmod 440 /etc/sudoers
@@ -369,9 +371,11 @@ perms(){
     chown root:root /etc/sysctl.conf
     chown root:root /proc/sys/net/ipv4/ip_forward
     chown root:root /etc/passwd
+    chown root:root /etc/passwd-
     chown root:shadow /etc/shadow
     chown root:root /etc/group
-    chown root:shadow /etc/gshadow
+    chown root:root /etc/group-
+    chown root:root /etc/gshadow
     chown root:root /etc/sudoers.d/
     chown root:root /etc/sudoers.d/*
     chown root:root /etc/sudoers
@@ -412,9 +416,9 @@ perms(){
     if [ -e "/var/log/messages" ]; then
         chown root:root /var/log/messages
     fi
-    if [ "$os_type" == "RHEL"]; then
+    if [ "$os_type" == "RHEL" ]; then
         sed -i "s/^umask.*/umask 077/" "/etc/profile" 
-    elif [ "$os_type" == "Ubuntu"]; then
+    elif [ "$os_type" == "Ubuntu" ]; then
         sed -i "s/^UMASK.*/UMASK 077/" "/etc/login.defs"
     fi
 }
