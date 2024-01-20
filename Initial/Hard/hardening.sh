@@ -28,7 +28,7 @@ fi
 
 # Sed sshd_config
 sed_ssh() {
-    echo "\n---------- Doing SSH config ----------"
+    echo "---------- Doing SSH config ----------"
     sed -i.bak 's/.*\(#\)\?Port.*/Port 22/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?Protocol.*/Protocol 2/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePrivilegeSeperation.*/UsePrivilegeSeperation yes/g' /etc/ssh/sshd_config
@@ -75,7 +75,7 @@ sed_ssh() {
 }
 
 fix_corrupt(){
-    echo "\n---------- Corrupt Packages ---------"
+    echo "---------- Corrupt Packages ---------"
     if [ "$os_type" == "RHEL" ]; then
         echo "fixing corrupt packages"
         rpm -qf $(rpm -Va 2>&1 | grep -vE '^$|prelink:' | sed 's|.* /|/|') | sort -u
@@ -91,12 +91,12 @@ fix_corrupt(){
 
 reset_environment() {
 
-    echo "\n---------- Resetting PATH variable ----------"
+    echo "---------- Resetting PATH variable ----------"
     echo "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games\"" > /etc/environment
 }
 
 check_ssh_keys() {
-    echo "\n---------- Checking for ssh keys... ----------"
+    echo "---------- Checking for ssh keys... ----------"
     s="sudo"
     $s cat /root/ssh/sshd_config | grep -i AuthorizedKeysFile
     $s head -n 20 /home/*/.ssh/authorized_keys*
@@ -104,7 +104,7 @@ check_ssh_keys() {
 }
 
 kernel(){
-    echo "\n---------- Doing stuff with Kernel ----------"
+    echo "---------- Doing stuff with Kernel ----------"
     echo "Resetting sysctl.conf file"
     cat configs/sysctl.conf > /etc/sysctl.conf
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
@@ -138,7 +138,7 @@ kernel(){
 }
 
 aliases(){
-    echo "\n---------- Resetting user bashrc files and profile file ----------" 
+    echo "---------- Resetting user bashrc files and profile file ----------" 
 	for user in $(cat users.txt); do
         	cat configs/bashrc > /home/$user/.bashrc;
 	done;
@@ -148,14 +148,14 @@ aliases(){
 
 configCmds(){
     if [ "$os_type" == "Ubuntu" ]; then
-        echo "\n---------- setting addusers.conf and delusers.conf -----------"
+        echo "---------- setting addusers.conf and delusers.conf -----------"
 	    cat configs/adduser.conf > /etc/adduser.conf
 	    cat configs/deluser.conf > /etc/deluser.conf
     fi
 }
 
 noIpv6(){
-    echo "\n----------- Removing IPv6... -----------"
+    echo "----------- Removing IPv6... -----------"
     interfaces=$(ifconfig | grep "flags" | awk '{print $1}' | tr -d ':')
     if [ os_type == "Debian" ]; then
         echo "removing IPv6 from sysctl"
@@ -212,7 +212,7 @@ noIpv6(){
 }
 
 cronConf(){
-    echo "\n----------- Cron Configs -----------"
+    echo "----------- Cron Configs -----------"
     #works for both ubuntu and RHEL
     IFS=$'\n'
     cronOwnerConfs=$(find /etc -type f -o -type d -name 'cron*' -exec stat -c "%U %n" {} \;)
@@ -243,7 +243,7 @@ cronConf(){
 }
 
 accessModes(){
-    echo "\n---------- Setting Single User and Emergency Mode Security -----------"
+    echo "---------- Setting Single User and Emergency Mode Security -----------"
     #single user mode
     singleFile="/usr/lib/systemd/system/rescue.service"
     singleSetting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
@@ -278,12 +278,12 @@ accessModes(){
 
     #no blank/null passwords
     cp "/etc/pam.d/common-password" /tmp/common-password.bak
-    sed -i  '/nullok/d' "/etc/pam.d/common-password"
+    sed -i '/nullok/d' "/etc/pam.d/common-password"
     echo "nullok removed from common-password, so no blank/null password are accepted"
 }
 
 maybeMalware(){
-    echo "\n----------- Trying to Find and Remove Malware -----------"
+    echo "----------- Trying to Find and Remove Malware -----------"
     REMOVE="john* netcat* iodine* kismet* medusa* hydra* fcrackzip* ayttm* empathy* nikto* logkeys* rdesktop* vinagre* openarena* openarena-server* minetest* minetest-server* ophcrack* crack* ldp* metasploit* wesnoth* freeciv* zenmap* knocker* bittorrent* torrent* p0f aircrack* aircrack-ng ettercap* irc* cl-irc* rsync* armagetron* postfix* nbtscan* cyphesis* endless-sky* hunt snmp* snmpd dsniff* lpd vino* netris* bestat* remmina netdiag inspircd* up.time uptimeagent chntpw* nfs* nfs-kernel-server* abc sqlmap acquisition bitcomet* bitlet* bitspirit* armitage airbase-ng* qbittorrent* ctorrent* ktorrent* rtorrent* deluge* tixati* frostwise vuse irssi transmission-gtk utorrent* exim4* crunch tomcat tomcat6 vncserver* tightvnc* tightvnc-common* tightvncserver* vnc4server* nmdb dhclient cryptcat* snort pryit gameconqueror* weplab lcrack dovecot* pop3 ember manaplus* xprobe* openra* ipscan* arp-scan* squid* heartbleeder* linuxdcpp* cmospwd* rfdump* cupp3* apparmor nis* ldap-utils prelink rsh-client rsh-redone-client* rsh-server quagga gssproxy iprutils sendmail nfs-utils ypserv tuned" 
     for package in $REMOVE; do
         if [ "$os_type" == "RHEL" ]; then
@@ -300,7 +300,7 @@ maybeMalware(){
 }
 
 deleteBad(){
-    echo "\n----------- Removing rhosts, host.equiv, etc. -----------"
+    echo "----------- Removing rhosts, host.equiv, etc. -----------"
     find / -name ".rhost" -exec rm -rf {} \;
     find / -name "host.equiv" -exec rm -rf {} \;
     find / -iname '*.xlsx' -delete
@@ -309,7 +309,7 @@ deleteBad(){
 }
 
 perms(){
-    echo "\n---------- Setting File Permissions -----------"
+    echo "---------- Setting File Permissions -----------"
     chmod 755 /etc/resolvconf/resolv.conf.d/
     chmod 644 /etc/resolvconf/resolv.conf.d/base
     chmod 777 /etc/resolv.conf
@@ -441,7 +441,7 @@ perms(){
 }
 
 fstab(){
-    echo "\n---------- fstab configs -----------"
+    echo "---------- fstab configs -----------"
 	echo "tmpfs /run/shm tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
 	echo "tmpfs /tmp tmpfs defaults,rw,nosuid,nodev,noexec,relatime 0 0" >> /etc/fstab
 	echo "tmpfs /var/tmp tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
@@ -451,7 +451,7 @@ fstab(){
 }
 
 etcConf(){
-    echo "\n---------- etc configs ----------"
+    echo "---------- etc configs ----------"
     echo "tty1" > /etc/securetty
 	echo "TMOUT=300" >> /etc/profile
 	echo "readonly TMOUT" >> /etc/profile
@@ -465,7 +465,7 @@ etcConf(){
 }
 
 dconfSettings(){
-    echo "\n---------- dconf Settings ----------"
+    echo "---------- dconf Settings ----------"
     dconf reset -f /
 	gsettings set org.gnome.desktop.privacy remember-recent-files false
 	gsettings set org.gnome.desktop.media-handling automount false
@@ -475,7 +475,7 @@ dconfSettings(){
 }
 
 passwordPolicy(){
-    echo "\n---------- Setting Password Policy ----------"
+    echo "---------- Setting Password Policy ----------"
     if [ "$os_type" == "RHEL" ]; then
         cp configs/password-auth.txt /etc/pam.d/password-auth
     elif [ "$os_type" == "Ubuntu" ]; then
@@ -485,7 +485,7 @@ passwordPolicy(){
 }
 
 other(){
-    echo "\n---------- Other Random Stuff To Run ----------"
+    echo "---------- Other Random Stuff To Run ----------"
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
     prelink -ua
     apt-get remove -y prelink
@@ -510,7 +510,7 @@ other(){
 }
 
 chattr(){
-    echo "\n---------- Setting Chattr ----------"
+    echo "---------- Setting Chattr ----------"
     chattr +ia /etc/passwd
     chattr +ia /etc/group
     chattr +ia /etc/shadow
@@ -539,4 +539,4 @@ dconfSettings
 passwordPolicy
 other
 #last thing absolutely last
-chattr
+#chattr
