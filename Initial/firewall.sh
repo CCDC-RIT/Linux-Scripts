@@ -15,6 +15,8 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+# Import inventory script for service variables, redirect output to null
+# source inventory.sh > /dev/null 2>&1
 
 ################
 ## Main Rules ##
@@ -84,6 +86,83 @@ iptables -t mangle -A OUTPUT -p tcp --sport ssh -m state --state ESTABLISHED -j 
 # iptables -t mangle -A OUTPUT -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
 # iptables -t mangle -A INPUT -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
 
+# # Allow MariaDB/MySQL Outgoing
+# echo "> Allow Outbound MariaDB/MySQL"
+# iptables -t mangle -A OUTPUT -p tcp --dport 3306 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow MariaDB/MySQL Incoming
+# echo "> Allow Inbound MariaDB/MySQL"
+# iptables -t mangle -A OUTPUT -p tcp --dport 3306 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow Postgresql Outgoing
+# echo "> Allow Outbound Postgresql "
+# iptables -t mangle -A OUTPUT -p tcp --dport 5432 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 5432 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow Postgresql Incoming
+# echo "> Allow Inbound Postgresql"
+# iptables -t mangle -A OUTPUT -p tcp --dport 5432 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 5432 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow Wazuh Outgoing
+# echo "> Allow Outbound Wazuh "
+# iptables -t mangle -A OUTPUT -p tcp --dport 443,514,1514,1515,1516,9200,9300:9400,55000 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 443,514,1514,1515,1516,9200,9300:9400,55000 -m state --state ESTABLISHED -j ACCEPT
+# iptables -t mangle -A OUTPUT -p udp --dport 514,1514 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p udp --sport 514,1514 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow Wazuh Incoming
+# echo "> Allow Inbound Wazuh"
+# iptables -t mangle -A OUTPUT -p tcp --dport 443,514,1514,1515,1516,9200,9300:9400,55000 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 443,514,1514,1515,1516,9200,9300:9400,55000 -m state --state ESTABLISHED -j ACCEPT
+# iptables -t mangle -A OUTPUT -p udp --dport 514,1514 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p udp --sport 514,1514 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow RHEL IDM clients Outbound
+# # Server *shouldn't* be initiating connections... probably. Just change "ESTABLISHED" to "NEW,ESTABLISHED" for INPUT if server initiates
+# echo "> Allow RHEL IDM Clients Outbound"
+# iptables -t mangle -A OUTPUT -p tcp --dport 80,443,389,636,88,464,53,749 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 80,443,389,636,88,464,53,749 -m state --state ESTABLISHED -j ACCEPT
+# iptables -t mangle -A OUTPUT -p udp --dport 88,464,53,123 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p udp --sport 88,464,53,123 -m state --state ESTABLISHED -j ACCEPT
+
+# # Allow RHEL IDM server-server comms
+# # Probably not needed if you just have a single server...
+# echo "> Allow RHEL IDM Server to Server (udp)"
+# iptables -t mangle -A OUTPUT -p tcp --dport 80,443,389,636,88,464,53,749,7389,9443,9444,9445,8005,8009 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 80,443,389,636,88,464,53,749,7389,9443,9444,9445,8005,8009 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A OUTPUT -p udp --dport 88,464,53,123 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p udp --sport 88,464,53,123 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# # Allow Hashicorp Vault Bidirectional
+# 443 is client to load balancer, 8200 incoming is between load balancer and servers, rest are server to server (or server to external api but those vary)
+# echo "> Allow Bidirectional Hashicorp Vault"
+# iptables -t mangle -A OUTPUT -p tcp --dport 8200,8201 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 8200,8201 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# # Allow Hashicorp Vault Incoming
+# echo "> Allow Inbound Hashicorp Vault"
+# iptables -t mangle -A OUTPUT -p tcp --dport 8200,443 -m state --state ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 8200,443 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# # Allow Kubernetes Control Plane Incoming
+# echo "> Allow Kubernetes Control Plane Incoming"
+# iptables -t mangle -A OUTPUT -p tcp --dport 6443,2379,2380,10250,10259,10257 -m state --state ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 6443,2379,2380,10250,10259,10257 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# # Allow Kubernetes Worker Node Incoming
+# echo "> Allow Kubernetes Control Plane Incoming"
+# iptables -t mangle -A OUTPUT -p tcp --dport 10250,30000:32767 -m state --state ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 10250,30000:32767 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# # Allow Gitlab Bidirectional (not sure which direction we need...)
+# 5050 is also needed for remote access to container registry but that's (mostly?) optional, plus any additional services
+# echo "> Allow Gitlab Bidirectional"
+# iptables -t mangle -A OUTPUT -p tcp --dport 80,443 -m state --state NEW,ESTABLISHED -j ACCEPT
+# iptables -t mangle -A INPUT -p tcp --sport 80,443 -m state --state NEW,ESTABLISHED -j ACCEPT
+
 # # Accept Various Port Incoming
 # echo "> Various Port Incoming"
 # iptables -t mangle -A INPUT -p tcp --dport 8000 -m state --state NEW,ESTABLISHED -j ACCEPT
@@ -105,11 +184,12 @@ iptables -t mangle -A INPUT -j DROP
 iptables -t mangle -A OUTPUT -j DROP
 
 # Backup Rules (iptables -t mangle-restore < backup)
-echo "> Back up rules"
+echo "> Backing up rules"
 iptables-save >/etc/ip_rules
 
 # Anti-Lockout Rule
 echo "> Sleep Initiated : Cancel Program to prevent flush"
-sleep 3
+echo "> pssst: this means to cancel the program to save the firewall changes"
+sleep 10
 iptables -t mangle -F
 echo "> Anti-Lockout executed : Rules have been flushed"
