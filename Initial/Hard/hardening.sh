@@ -3,6 +3,9 @@
 # by: Hal Williams (hfw8271) and Justin Huang (jznn)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
+exec > bruh.txt
+exec 2> failedShi.txt
+
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
 if [ -e /etc/redhat-release ]; then
     os_type="RHEL"
