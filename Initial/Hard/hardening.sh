@@ -18,8 +18,8 @@ elif [ -e /etc/debian_version ]; then
 fi
 
 
-exec > bruh.txt
-exec 2> failedShi.txt
+exec > Hardening.txt
+exec 2> Hardening_Has_Failed.txt
 
 if [ ! -f "./users.txt" ]; then
     echo "Necessary text files for users is not present. Shutting down script."
