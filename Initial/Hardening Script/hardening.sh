@@ -450,9 +450,10 @@ dconfSettings(){
 
 passwordPolicy(){
     if [ "$os_type" == "RHEL" ]; then
-        
+        cp configs/password-auth.txt /etc/pam.d/password-auth
     elif [ "$os_type" == "Ubuntu" ]; then
-
+        cp configs/common-auth.txt /etc/pam.d/common-auth
+        cp configs/common-password.txt /etc/common-password
     fi    
 }
 
