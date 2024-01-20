@@ -409,6 +409,9 @@ perms(){
     chown root:root /tmp
     chown root:root /usr
     chown root:root /var/
+    if [ -e "/var/log/messages" ]; then
+        chown root:root /var/log/messages
+    if
     if [ "$os_type" == "RHEL"]; then
         sed -i "s/^umask.*/umask 077/" "/etc/profile" 
     elif [ "$os_type" == "Ubuntu"]
