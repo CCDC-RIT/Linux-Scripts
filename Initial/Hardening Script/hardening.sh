@@ -495,7 +495,7 @@ perms
 fstab
 etcConf
 dconfSettings
-othe
+other
 #last thing absolutely last
 chattr
 
