@@ -67,7 +67,6 @@ ALL(){
     echo -e "$NEW_PASS\n$NEW_PASS"|ipa user-mod admin --password
     read -s -p "Please enter new LDAP Directory Manager Password: " NEW_LDAP_PASS < /dev/tty
     echo -e "dn: cn=config\nchangetype: modify\nreplace: nsslapd-rootpw\nnsslapd-rootpw: $NEW_LDAP_PASS\n\n"|ldapmodify -x -H "ldaps://$HOSTNAME:636" -D "cn=directory manager" -w $LDAP_PASS
-
     systemctl restart dirsrv.target > /dev/null #Restarts service for changes to take effect
     service krb5kdc restart > /dev/null #restarts Kerberos for changes to take effect
 }
@@ -103,3 +102,4 @@ while true; do
     display_options
     handle_input
 done
+#CHANDI FORTNITE
