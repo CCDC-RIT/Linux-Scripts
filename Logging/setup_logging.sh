@@ -155,11 +155,11 @@ random_old_stuff() {
         #Gotta do snoopy manually
 
         echo "Installing Argus..."
-        # sudo apt install argus-server
-        sudo apt install argus-client
+        # apt install argus-server
+        apt install argus-client
 
         # Start Argus as a service ON BOTH SERVER AND CLIENT
-        sudo service argus start
+        service argus start
 
         # Start the Argus sensor as a background daemon on port 561 ON SERVER
         # argus -n -P 561 -w - | ra -n
