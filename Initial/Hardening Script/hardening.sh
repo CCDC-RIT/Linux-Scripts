@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# by: Justin Huang (jznn), and Hal Williams (hfw8271)
+# by: Justin Huang (jznn) and Hal Williams (hfw8271)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
@@ -475,10 +475,7 @@ chattr(){
     chattr +ia /etc/shadow-
 }
 
-
 # main
-
-
 sed_ssh
 fix_corrupt
 reset_environment
@@ -498,6 +495,3 @@ dconfSettings
 other
 #last thing absolutely last
 chattr
-
-# add more here
-
