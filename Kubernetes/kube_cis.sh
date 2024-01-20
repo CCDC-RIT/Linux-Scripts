@@ -87,4 +87,5 @@ chmod -R 600 /etc/kubernetes/pki/*.crt
 echo "1.1.21 -- Ensure that the Kubernetes PKI key file permissions are set to 600"
 chmod -R 600 /etc/kubernetes/pki/*.key
 
-
+echo "1.2.1, 1.2.3, 1.2.6, 1.2.7, 1.2.8, 1.2.9, 1.2.10, 1.2.11, 1.2.12, 1.2.13, \
+1.2.14, 1.2.15, 1.2.16, 1.2.17, 1.2.18, 1.2.19, 1.2.20, 1.2.21, 1.2.22"

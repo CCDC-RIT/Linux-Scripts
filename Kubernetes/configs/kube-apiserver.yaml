@@ -21,7 +21,7 @@ spec:
     - --audit-webhook-batch-max-size=1
     - --authorization-mode=Node,RBAC
     - --client-ca-file=/etc/kubernetes/pki/ca.crt
-    - --enable-admission-plugins=NodeRestriction
+    - --enable-admission-plugins=NodeRestriction,EventRateLimit,AlwaysPullImages,SecurityContextDeny
     - --enable-bootstrap-token-auth=true
     - --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt
     - --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
@@ -44,7 +44,15 @@ spec:
     - --service-cluster-ip-range=10.0.0.0/12
     - --tls-cert-file=/etc/kubernetes/pki/apiserver.crt
     - --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
-    - --anonymous-auth=true
+    - --anonymous-auth=false
+    - --disable-admission-plugins=DenyServiceExternalIPs,AlwaysDeny
+    - --profiling=false
+    - --audit-log-path=/var/log/apiserver/audit.log
+    - --audit-log-maxage=30
+    - --audit-log-maxbackup=10
+    - --audit-log-maxsize=100
+    - --request-timeout=300s
+    - --service-account-lookup=true
     image: registry.k8s.io/kube-apiserver:v1.29.1
     imagePullPolicy: IfNotPresent
     livenessProbe:
