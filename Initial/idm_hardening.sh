@@ -38,7 +38,7 @@ display_options() {
     echo "1. Apply RHEL IdM Hardening Settings"
     echo "2. Change IdM Domain admin Password"
     echo "3. Change LDAP Directory Manager Password"
-    echo "4. Do It All" #Does all of the other options
+    echo "4. All of The Above" #Does all of the other options
     echo "5. Exit"
 }
 
