@@ -3,8 +3,11 @@
 # by: Hal Williams (hfw8271) and Justin Huang (jznn)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
-exec > bruh.txt
-exec 2> failedShi.txt
+# verify that script is being run with root privileges
+if  [ "$EUID" -ne 0 ]; then 
+    echo "User is not root. Skill issue."
+    exit 
+fi
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
 if [ -e /etc/redhat-release ]; then
@@ -13,11 +16,10 @@ if [ -e /etc/redhat-release ]; then
 elif [ -e /etc/debian_version ]; then
     os_type="Debian"
 fi
-# verify that script is being run with root privileges
-if  [ "$EUID" -ne 0 ]; then 
-    echo "User is not root. Skill issue."
-    exit 
-fi
+
+
+exec > bruh.txt
+exec 2> failedShi.txt
 
 if [ ! -f "./users.txt" ]; then
     echo "Necessary text files for users is not present. Shutting down script."
