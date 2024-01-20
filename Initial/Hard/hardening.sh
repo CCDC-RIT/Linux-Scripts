@@ -506,7 +506,7 @@ other(){
     echo "$(awk -F: '$3 == 0 {print $1}' /etc/passwd) these accounts have UID of 0, anything other than root go into /etc/passwd and fix this"
 
 
-    echo "make sure to lock root in like 5 minutes bozos \n(sudo passwd -l root) \nmake sure you got an account with sudo"
+    echo "make sure to lock root in like 5 minutes bozos --- (sudo passwd -l root) --- make sure you got an account with sudo"
 }
 
 chattr(){
