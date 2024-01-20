@@ -1,8 +1,9 @@
+# Replace x.x.x.x with managers IP address
 apiVersion: v1
 kind: Pod
 metadata:
   annotations:
-    kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 192.168.1.85:6443
+    kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: x.x.x.x:6443
   creationTimestamp: null
   labels:
     component: kube-apiserver
@@ -13,7 +14,7 @@ spec:
   containers:
   - command:
     - kube-apiserver
-    - --advertise-address=192.168.1.85
+    - --advertise-address=x.x.x.x
     - --allow-privileged=true
     - --authorization-mode=Node,RBAC
     - --client-ca-file=/etc/kubernetes/pki/ca.crt
@@ -37,7 +38,7 @@ spec:
     - --service-account-issuer=https://kubernetes.default.svc.cluster.local
     - --service-account-key-file=/etc/kubernetes/pki/sa.pub
     - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key
-    - --service-cluster-ip-range=10.96.0.0/12
+    - --service-cluster-ip-range=10.0.0.0/12
     - --tls-cert-file=/etc/kubernetes/pki/apiserver.crt
     - --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
     - --anonymous-auth=true
@@ -46,7 +47,7 @@ spec:
     livenessProbe:
       failureThreshold: 8
       httpGet:
-        host: 192.168.1.85
+        host: x.x.x.x
         path: /livez
         port: 6443
         scheme: HTTPS
@@ -57,7 +58,7 @@ spec:
     readinessProbe:
       failureThreshold: 3
       httpGet:
-        host: 192.168.1.85
+        host: x.x.x.x
         path: /readyz
         port: 6443
         scheme: HTTPS
@@ -69,7 +70,7 @@ spec:
     startupProbe:
       failureThreshold: 24
       httpGet:
-        host: 192.168.1.85
+        host: x.x.x.x
         path: /livez
         port: 6443
         scheme: HTTPS
