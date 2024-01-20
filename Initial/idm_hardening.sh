@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$EUID" -ne 0 ]; then 
-  echo "Run as sudo"
+  echo "Run As Sudo"
   exit
 fi
 
