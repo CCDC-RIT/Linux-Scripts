@@ -9,7 +9,7 @@ if [ -e /etc/redhat-release ]; then
 # check if /etc/debian_version file exists, indicating a debian-based system
 elif [ -e /etc/debian_version ]; then
     os_type="Debian"
-
+fi
 # verify that script is being run with root privileges
 if  [ "$EUID" -ne 0 ]; then 
     echo "User is not root. Skill issue."
