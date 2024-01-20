@@ -114,13 +114,13 @@ kernel(){
     #kernel profiling
     kernelParanoid=$(sysctl kernel.perf_event_paranoid | awk '{print $3}')
     if [ "$os_type" == "RHEL" ]; then
-        if [ "$kernelParanoid" != "2"]
+        if [ "$kernelParanoid" != "2"]; then
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 2, and will now be fixed"
             echo "kernel.perf_event_paranoid = 2" >> /etc/sysctl.d/99-sysctl.conf
             sysctl -system
         fi
     elif [ "$os_type" == "debian"]; then
-        if [ "$kernelParanoid" != "2"]
+        if [ "$kernelParanoid" != "2"]; then
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 4, and will now be fixed"
             echo "kernel.perf_event_paranoid = 4" >> /etc/sysctl.d/99-sysctl.conf
             sysctl --system
@@ -424,6 +424,8 @@ fstab(){
 	echo "tmpfs /tmp tmpfs defaults,rw,nosuid,nodev,noexec,relatime 0 0" >> /etc/fstab
 	echo "tmpfs /var/tmp tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
   	echo "proc /proc proc nosuid,nodev,noexec,hidepid=2,gid=proc 0 0" >> /etc/fstab
+
+
 }
 
 etcConf(){
