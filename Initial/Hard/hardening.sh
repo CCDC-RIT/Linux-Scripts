@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# by: Justin Huang (jznn) and Hal Williams (hfw8271)
+# by: Hal Williams (hfw8271) and Justin Huang (jznn)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
+
+# verify that script is being run with root privileges
+if  [ "$EUID" -ne 0 ]; then 
+    echo "User is not root. Skill issue."
+    exit 
+fi
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
 if [ -e /etc/redhat-release ]; then
@@ -9,12 +15,11 @@ if [ -e /etc/redhat-release ]; then
 # check if /etc/debian_version file exists, indicating a debian-based system
 elif [ -e /etc/debian_version ]; then
     os_type="Debian"
-
-# verify that script is being run with root privileges
-if  [ "$EUID" -ne 0 ]; then 
-    echo "User is not root. Skill issue."
-    exit 
 fi
+
+
+exec > bruh.txt
+exec 2> failedShi.txt
 
 if [ ! -f "./users.txt" ]; then
     echo "Necessary text files for users is not present. Shutting down script."
@@ -23,6 +28,7 @@ fi
 
 # Sed sshd_config
 sed_ssh() {
+    echo "---------- Doing SSH config ----------"
     sed -i.bak 's/.*\(#\)\?Port.*/Port 22/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?Protocol.*/Protocol 2/g' /etc/ssh/sshd_config
     sed -i.bak 's/.*\(#\)\?UsePrivilegeSeperation.*/UsePrivilegeSeperation yes/g' /etc/ssh/sshd_config
@@ -69,26 +75,28 @@ sed_ssh() {
 }
 
 fix_corrupt(){
-    if [ "$os_type" = "RHEL" ]; then
+    echo "---------- Corrupt Packages ---------"
+    if [ "$os_type" == "RHEL" ]; then
         echo "fixing corrupt packages"
         rpm -qf $(rpm -Va 2>&1 | grep -vE '^$|prelink:' | sed 's|.* /|/|') | sort -u
     fi
 
-    if [ "$os_type" = "Debian" ]; then
+    if [ "$os_type" == "Debian" ]; then
         echo "fixing corrupt packages"
-        apt-fast install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
+        apt install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
         echo "fixing files with missing files"
-        xargs -rd '\n' -a <(sudo debsums -c 2>&1 | cut -d " " -f 4 | sort -u | xargs -rd '\n' -- dpkg -S | cut -d : -f 1 | sort -u) -- sudo apt-get install -f --reinstall --
+        xargs -rd '\n' -a <(sudo debsums -c 2>&1 | cut -d " " -f 4 | sort -u | xargs -rd '\n' -- dpkg -S | cut -d : -f 1 | sort -u) -- sudo apt-get install -f -y --reinstall -- 
     fi
 }
 
 reset_environment() {
-    echo "\n Resetting PATH variable"
+
+    echo "---------- Resetting PATH variable ----------"
     echo "PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games\"" > /etc/environment
 }
 
 check_ssh_keys() {
-    echo "\n Checking for ssh keys..."
+    echo "---------- Checking for ssh keys... ----------"
     s="sudo"
     $s cat /root/ssh/sshd_config | grep -i AuthorizedKeysFile
     $s head -n 20 /home/*/.ssh/authorized_keys*
@@ -96,7 +104,8 @@ check_ssh_keys() {
 }
 
 kernel(){
-    echo "\n Resetting sysctl.conf file"
+    echo "---------- Doing stuff with Kernel ----------"
+    echo "Resetting sysctl.conf file"
     cat configs/sysctl.conf > /etc/sysctl.conf
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
 
@@ -114,13 +123,13 @@ kernel(){
     #kernel profiling
     kernelParanoid=$(sysctl kernel.perf_event_paranoid | awk '{print $3}')
     if [ "$os_type" == "RHEL" ]; then
-        if [ "$kernelParanoid" != "2"]
+        if [ "$kernelParanoid" != "2" ]; then
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 2, and will now be fixed"
             echo "kernel.perf_event_paranoid = 2" >> /etc/sysctl.d/99-sysctl.conf
             sysctl -system
         fi
-    elif [ "$os_type" == "debian"]; then
-        if [ "$kernelParanoid" != "2"]
+    elif [ "$os_type" == "debian" ]; then
+        if [ "$kernelParanoid" != "2" ]; then
             echo "$(sysctl kernel.perf_event_paranoid) should be set to 4, and will now be fixed"
             echo "kernel.perf_event_paranoid = 4" >> /etc/sysctl.d/99-sysctl.conf
             sysctl --system
@@ -129,7 +138,7 @@ kernel(){
 }
 
 aliases(){
-    echo "\n Resetting user bashrc files and profile file" 
+    echo "---------- Resetting user bashrc files and profile file ----------" 
 	for user in $(cat users.txt); do
         	cat configs/bashrc > /home/$user/.bashrc;
 	done;
@@ -138,12 +147,15 @@ aliases(){
 }
 
 configCmds(){
-	cat configs/adduser.conf > /etc/adduser.conf
-	cat configs/deluser.conf > /etc/deluser.conf
+    if [ "$os_type" == "Ubuntu" ]; then
+        echo "---------- setting addusers.conf and delusers.conf -----------"
+	    cat configs/adduser.conf > /etc/adduser.conf
+	    cat configs/deluser.conf > /etc/deluser.conf
+    fi
 }
 
 noIpv6(){
-    echo "/n Removing IPv6..."
+    echo "----------- Removing IPv6... -----------"
     interfaces=$(ifconfig | grep "flags" | awk '{print $1}' | tr -d ':')
     if [ os_type == "Debian" ]; then
         echo "removing IPv6 from sysctl"
@@ -200,6 +212,7 @@ noIpv6(){
 }
 
 cronConf(){
+    echo "----------- Cron Configs -----------"
     #works for both ubuntu and RHEL
     IFS=$'\n'
     cronOwnerConfs=$(find /etc -type f -o -type d -name 'cron*' -exec stat -c "%U %n" {} \;)
@@ -230,6 +243,7 @@ cronConf(){
 }
 
 accessModes(){
+    echo "---------- Setting Single User and Emergency Mode Security -----------"
     #single user mode
     singleFile="/usr/lib/systemd/system/rescue.service"
     singleSetting="ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
@@ -264,27 +278,29 @@ accessModes(){
 
     #no blank/null passwords
     cp "/etc/pam.d/common-password" /tmp/common-password.bak
-    sed -i  '/nullok/d' "/etc/pam.d/common-password"
-    echo "nullok removed from common-password"
+    sed -i '/nullok/d' "/etc/pam.d/common-password"
+    echo "nullok removed from common-password, so no blank/null password are accepted"
 }
 
 maybeMalware(){
-    REMOVE = "john* netcat* iodine* kismet* medusa* hydra* fcrackzip* ayttm* empathy* nikto* logkeys* rdesktop* vinagre* openarena* openarena-server* minetest* minetest-server* ophcrack* crack* ldp* metasploit* wesnoth* freeciv* zenmap* knocker* bittorrent* torrent* p0f aircrack* aircrack-ng ettercap* irc* cl-irc* rsync* armagetron* postfix* nbtscan* cyphesis* endless-sky* hunt snmp* snmpd dsniff* lpd vino* netris* bestat* remmina netdiag inspircd* up.time uptimeagent chntpw* nfs* nfs-kernel-server* abc sqlmap acquisition bitcomet* bitlet* bitspirit* armitage airbase-ng* qbittorrent* ctorrent* ktorrent* rtorrent* deluge* tixati* frostwise vuse irssi transmission-gtk utorrent* exim4* crunch tomcat tomcat6 vncserver* tightvnc* tightvnc-common* tightvncserver* vnc4server* nmdb dhclient cryptcat* snort pryit gameconqueror* weplab lcrack dovecot* pop3 ember manaplus* xprobe* openra* ipscan* arp-scan* squid* heartbleeder* linuxdcpp* cmospwd* rfdump* cupp3* apparmor nis* ldap-utils prelink rsh-client rsh-redone-client* rsh-server quagga gssproxy iprutils sendmail nfs-utils ypserv tuned" 
+    echo "----------- Trying to Find and Remove Malware -----------"
+    REMOVE="john* netcat* iodine* kismet* medusa* hydra* fcrackzip* ayttm* empathy* nikto* logkeys* rdesktop* vinagre* openarena* openarena-server* minetest* minetest-server* ophcrack* crack* ldp* metasploit* wesnoth* freeciv* zenmap* knocker* bittorrent* torrent* p0f aircrack* aircrack-ng ettercap* irc* cl-irc* rsync* armagetron* postfix* nbtscan* cyphesis* endless-sky* hunt snmp* snmpd dsniff* lpd vino* netris* bestat* remmina netdiag inspircd* up.time uptimeagent chntpw* nfs* nfs-kernel-server* abc sqlmap acquisition bitcomet* bitlet* bitspirit* armitage airbase-ng* qbittorrent* ctorrent* ktorrent* rtorrent* deluge* tixati* frostwise vuse irssi transmission-gtk utorrent* exim4* crunch tomcat tomcat6 vncserver* tightvnc* tightvnc-common* tightvncserver* vnc4server* nmdb dhclient cryptcat* snort pryit gameconqueror* weplab lcrack dovecot* pop3 ember manaplus* xprobe* openra* ipscan* arp-scan* squid* heartbleeder* linuxdcpp* cmospwd* rfdump* cupp3* apparmor nis* ldap-utils prelink rsh-client rsh-redone-client* rsh-server quagga gssproxy iprutils sendmail nfs-utils ypserv tuned" 
     for package in $REMOVE; do
-        if [ "$os_type" = "RHEL" ]; then
+        if [ "$os_type" == "RHEL" ]; then
             removed=$(dnf remove $package -y)
         fi
 
-        if [ "$os_type" = "Debian" ]; then
+        if [ "$os_type" == "Debian" ]; then
             removed=$(apt purge $package -y) 
         fi
-        if [ "$removed" != "*0 to remove*" || "$removed" != "*Nothing to do*"]; then
+        if [ "$removed" != "*0 to remove*" || "$removed" != "*Nothing to do*" ]; then
             echo "$package was removed from the system"
         fi 
     done
 }
 
 deleteBad(){
+    echo "----------- Removing rhosts, host.equiv, etc. -----------"
     find / -name ".rhost" -exec rm -rf {} \;
     find / -name "host.equiv" -exec rm -rf {} \;
     find / -iname '*.xlsx' -delete
@@ -293,6 +309,7 @@ deleteBad(){
 }
 
 perms(){
+    echo "---------- Setting File Permissions -----------"
     chmod 755 /etc/resolvconf/resolv.conf.d/
     chmod 644 /etc/resolvconf/resolv.conf.d/base
     chmod 777 /etc/resolv.conf
@@ -311,9 +328,11 @@ perms(){
     chmod 644 /etc/sysctl.conf
     chmod 644 /proc/sys/net/ipv4/ip_forward
     chmod 644 /etc/passwd
+    chmod 644 /etc/passwd-
     chmod 640 /etc/shadow
     chmod 644 /etc/group
-    chmod 640 /etc/gshadow
+    chmod 644 /etc/group-
+    chmod 000 /etc/gshadow
     chmod 755 /etc/sudoers.d/
     chmod 440 /etc/sudoers.d/*
     chmod 440 /etc/sudoers
@@ -369,9 +388,11 @@ perms(){
     chown root:root /etc/sysctl.conf
     chown root:root /proc/sys/net/ipv4/ip_forward
     chown root:root /etc/passwd
+    chown root:root /etc/passwd-
     chown root:shadow /etc/shadow
     chown root:root /etc/group
-    chown root:shadow /etc/gshadow
+    chown root:root /etc/group-
+    chown root:root /etc/gshadow
     chown root:root /etc/sudoers.d/
     chown root:root /etc/sudoers.d/*
     chown root:root /etc/sudoers
@@ -411,22 +432,26 @@ perms(){
     chown root:root /var/
     if [ -e "/var/log/messages" ]; then
         chown root:root /var/log/messages
-    if
-    if [ "$os_type" == "RHEL"]; then
+    fi
+    if [ "$os_type" == "RHEL" ]; then
         sed -i "s/^umask.*/umask 077/" "/etc/profile" 
-    elif [ "$os_type" == "Ubuntu"]
+    elif [ "$os_type" == "Ubuntu" ]; then
         sed -i "s/^UMASK.*/UMASK 077/" "/etc/login.defs"
     fi
 }
 
 fstab(){
+    echo "---------- fstab configs -----------"
 	echo "tmpfs /run/shm tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
 	echo "tmpfs /tmp tmpfs defaults,rw,nosuid,nodev,noexec,relatime 0 0" >> /etc/fstab
 	echo "tmpfs /var/tmp tmpfs defaults,nodev,noexec,nosuid 0 0" >> /etc/fstab
   	echo "proc /proc proc nosuid,nodev,noexec,hidepid=2,gid=proc 0 0" >> /etc/fstab
+
+
 }
 
 etcConf(){
+    echo "---------- etc configs ----------"
     echo "tty1" > /etc/securetty
 	echo "TMOUT=300" >> /etc/profile
 	echo "readonly TMOUT" >> /etc/profile
@@ -440,6 +465,7 @@ etcConf(){
 }
 
 dconfSettings(){
+    echo "---------- dconf Settings ----------"
     dconf reset -f /
 	gsettings set org.gnome.desktop.privacy remember-recent-files false
 	gsettings set org.gnome.desktop.media-handling automount false
@@ -448,7 +474,18 @@ dconfSettings(){
 	dconf update /
 }
 
+passwordPolicy(){
+    echo "---------- Setting Password Policy ----------"
+    if [ "$os_type" == "RHEL" ]; then
+        cp configs/password-auth.txt /etc/pam.d/password-auth
+    elif [ "$os_type" == "Ubuntu" ]; then
+        cp configs/common-auth.txt /etc/pam.d/common-auth
+        cp configs/common-password.txt /etc/pam.d/common-password
+    fi    
+}
+
 other(){
+    echo "---------- Other Random Stuff To Run ----------"
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
     prelink -ua
     apt-get remove -y prelink
@@ -466,10 +503,14 @@ other(){
     systemctl start fail2ban
 
     echo "$(awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd) those are interactive users with duplicate UIDs, please access /etc/passwd and give each a unique id."
-    
+    echo "$(awk -F: '$3 == 0 {print $1}' /etc/passwd) these accounts have UID of 0, anything other than root go into /etc/passwd and fix this"
+
+
+    echo "make sure to lock root in like 5 minutes bozos \n(sudo passwd -l root) \nmake sure you got an account with sudo"
 }
 
 chattr(){
+    echo "---------- Setting Chattr ----------"
     chattr +ia /etc/passwd
     chattr +ia /etc/group
     chattr +ia /etc/shadow
@@ -495,6 +536,7 @@ perms
 fstab
 etcConf
 dconfSettings
+passwordPolicy
 other
 #last thing absolutely last
-chattr
+#chattr
