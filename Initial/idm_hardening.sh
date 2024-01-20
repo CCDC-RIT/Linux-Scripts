@@ -29,8 +29,8 @@ idm_hardening(){
     #Disables anonymous LDAP binds from reading directory data while still allowing binds to root DSE information needed to get connection info (using LDAPS):
     echo -e "dn: cn=config\nchangetype: modify\nreplace: nsslapd-allow-anonymous-access\nnsslapd-allow-anonymous-access: rootdse\n" | ldapmodify -x -D "cn=Directory Manager" -W -H "ldaps://$HOSTNAME:636"
     ipa krbtpolicy-mod --maxlife=$((1*60*60)) --maxrenew=$((5*60*60)) #Change Kerberos global ticket policy time (max life of 1 hour and max renew of 5 hours)
-    systemctl restart dirsrv.target #Restarts service for changes to take effect
-    service krb5kdc restart #restarts Kerberos for changes to take effect 
+    systemctl restart dirsrv.target > /dev/null #Restarts service for changes to take effect
+    service krb5kdc restart > /dev/null #restarts Kerberos for changes to take effect 
 }
 
 display_options() {
@@ -56,8 +56,8 @@ ALL(){
     read -s -p "Please enter new LDAP Directory Manager Password: " NEW_LDAP_PASS < /dev/tty
     echo -e "dn: cn=config\nchangetype: modify\nreplace: nsslapd-rootpw\nnsslapd-rootpw: $NEW_LDAP_PASS\n\n"|ldapmodify -x -H "ldaps://$HOSTNAME:636" -D "cn=directory manager" -w $LDAP_PASS
 
-    systemctl restart dirsrv.target #Restarts service for changes to take effect
-    service krb5kdc restart #restarts Kerberos for changes to take effect
+    systemctl restart dirsrv.target > /dev/null #Restarts service for changes to take effect
+    service krb5kdc restart > /dev/null #restarts Kerberos for changes to take effect
 }
 
 handle_input(){
