@@ -124,22 +124,24 @@ wazuh_setup() {
 
     # Filepath *should* be the same in all OSes according to docs
     # https://documentation.wazuh.com/current/user-manual/reference/statistics-files/wazuh-agentd-state.html
-    echo "Waiting a couple seconds to receive acknowledgement from Wazuh manager..."
-    sleep 10 #wait a couple seconds for connection status to update
-    filepath=/var/ossec/var/run/wazuh-agentd.state
-    if [ -e "$filepath" ]; then
+    echo "Please view /var/ossec/var/run/wazuh-agentd.state to see if Wazuh connected successfully"
+    # Why can't i automate this...
+    #echo "Waiting a couple seconds to receive acknowledgement from Wazuh manager..."
+    #sleep 10 #wait a couple seconds for connection status to update
+    #filepath=/var/ossec/var/run/wazuh-agentd.state
+    #if [ -e "$filepath" ]; then
         # echo "File exists."
-        if grep -q "status='connected'" $filepath; then
+    #    if grep -q "status='connected'" $filepath; then
             # echo "The file contains 'status=connected'."
-            echo "Wazuh client agent has connected to the manager successfully!"
-        else
+    #        echo "Wazuh client agent has connected to the manager successfully!"
+    #    else
             # echo "The file does not contain 'status=connected'."
-            echo "Wazuh client agent has not connected to the manager successfully, see $filepath for details!"
-        fi
-    else
-        echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
+    #        echo "Wazuh client agent has not connected to the manager successfully, see $filepath for details!"
+    #    fi
+    #else
+    #    echo "Error: $filepath does not exist, wazuh client agent connection state cannot be automatically determined by this script!"
         # Your code here if the file does not exist
-    fi
+    #fi
 }
 
 # I don't even know dawg - Guac0
@@ -153,6 +155,20 @@ random_old_stuff() {
         #DEBIAN_FRONTEND=noninteractive apt-get install snoopy -y
         #/usr/sbin/snoopy-enable
         #Gotta do snoopy manually
+
+        echo "Installing Argus..."
+        # apt install argus-server
+        apt install argus-client
+
+        # Start Argus as a service ON BOTH SERVER AND CLIENT
+        service argus start
+
+        # Start the Argus sensor as a background daemon on port 561 ON SERVER
+        # argus -n -P 561 -w - | ra -n
+
+        # Read the sensor data on a client periodically (should dedicate a terminal window to this) ON CLIENT
+        # ra -r /var/log/argus/argus.out 
+
         
         echo "Insatlling/Setting up auditd..."
         apt-get install auditd

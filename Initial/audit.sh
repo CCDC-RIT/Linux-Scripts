@@ -152,6 +152,12 @@ verbose(){
     else
       echo "this approach dont work for RHEL cope"
     fi
+
+    echo -e "\n------------------\n > Running external audit scripts <\n------------------"
+    echo -e "\n------------------\n > Linpeas - output to linpeas.txt <\n------------------"
+    curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh > linpeas.txt
+    echo -e "\n------------------\n > Lynis - output to lynis.txt <\n------------------"
+    lynis audit system > lynis.txt
 }
 
 # Get User Input to get sleep time and Type

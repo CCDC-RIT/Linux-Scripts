@@ -18,8 +18,8 @@ elif [ -e /etc/debian_version ]; then
 fi
 
 
-exec > bruh.txt
-exec 2> failedShi.txt
+exec > Hardening.txt
+exec 2> Hardening_Has_Failed.txt
 
 if [ ! -f "./users.txt" ]; then
     echo "Necessary text files for users is not present. Shutting down script."
@@ -83,7 +83,7 @@ fix_corrupt(){
 
     if [ "$os_type" == "Debian" ]; then
         echo "fixing corrupt packages"
-        apt install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
+        apt-get install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
         echo "fixing files with missing files"
         xargs -rd '\n' -a <(sudo debsums -c 2>&1 | cut -d " " -f 4 | sort -u | xargs -rd '\n' -- dpkg -S | cut -d : -f 1 | sort -u) -- sudo apt-get install -f -y --reinstall -- 
     fi
@@ -506,7 +506,7 @@ other(){
     echo "$(awk -F: '$3 == 0 {print $1}' /etc/passwd) these accounts have UID of 0, anything other than root go into /etc/passwd and fix this"
 
 
-    echo "make sure to lock root in like 5 minutes bozos \n(sudo passwd -l root) \nmake sure you got an account with sudo"
+    echo "make sure to lock root in like 5 minutes bozos --- (sudo passwd -l root) --- make sure you got an account with sudo"
 }
 
 chattr(){
@@ -521,7 +521,7 @@ chattr(){
 
 # main
 sed_ssh
-fix_corrupt
+#fix_corrupt
 reset_environment
 check_ssh_keys
 kernel

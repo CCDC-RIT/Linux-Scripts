@@ -533,6 +533,12 @@ osquery_install() {
         cp -fr Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
         osqueryctl start osqueryd
 
+        # Do it a second time since last minute error!
+        osqueryctl stop osqueryd
+        mv /etc/osquery/osquery.conf /etc/osquery/osquery.conf.backup
+        cp -fr Linux-Scripts/Logging/osquery.conf /etc/osquery/osquery.conf
+        osqueryctl start osqueryd
+
         echo "Osquery installed from local binary repo of v5.11.0-1 and config file installed!"
     elif $REDHAT || $RHEL || $AMZ || $FEDORA ; then
         # REDHAT uses yum as native, AMZ uses yum or DNF with a yum alias depending on version
