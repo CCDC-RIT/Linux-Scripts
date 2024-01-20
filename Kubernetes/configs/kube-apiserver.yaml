@@ -16,6 +16,9 @@ spec:
     - kube-apiserver
     - --advertise-address=x.x.x.x
     - --allow-privileged=true
+    - --audit-policy-file=/etc/kubernetes/audit-policy.yaml
+    - --audit-webhook-config-file=/etc/kubernetes/audit-webhook.yaml
+    - --audit-webhook-batch-max-size=1
     - --authorization-mode=Node,RBAC
     - --client-ca-file=/etc/kubernetes/pki/ca.crt
     - --enable-admission-plugins=NodeRestriction
@@ -96,6 +99,12 @@ spec:
     - mountPath: /usr/share/ca-certificates
       name: usr-share-ca-certificates
       readOnly: true
+    - mountPath: /etc/kubernetes/audit-policy.yaml
+      name: audit
+      readOnly: true
+    - mountPath: /etc/kubernetes/audit-webhook.yaml
+      name: audit-webhook
+      readOnly: true
   hostNetwork: true
   priority: 2000001000
   priorityClassName: system-node-critical
@@ -127,4 +136,12 @@ spec:
       path: /usr/share/ca-certificates
       type: DirectoryOrCreate
     name: usr-share-ca-certificates
+  - hostPath:
+      path: /etc/kubernetes/audit-policy.yaml
+      type: File
+    name: audit
+  - hostPath:
+      path: /etc/kubernetes/audit-webhook.yaml
+      type: File
+    name: audit-webhook
 status: {}
