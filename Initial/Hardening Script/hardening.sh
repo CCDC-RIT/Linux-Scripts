@@ -448,6 +448,14 @@ dconfSettings(){
 	dconf update /
 }
 
+passwordPolicy(){
+    if [ "$os_type" == "RHEL" ]; then
+        
+    elif [ "$os_type" == "Ubuntu" ]; then
+
+    fi    
+}
+
 other(){
     echo 0 > /proc/sys/kernel/unprivileged_userns_clone
     prelink -ua
@@ -466,7 +474,10 @@ other(){
     systemctl start fail2ban
 
     echo "$(awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd) those are interactive users with duplicate UIDs, please access /etc/passwd and give each a unique id."
-    
+    echo "$(awk -F: '$3 == 0 {print $1}' /etc/passwd) these accounts have UID of 0, anything other than root go into /etc/passwd and fix this"
+
+
+    echo "make sure to lock root in like 5 minutes bozos \n(sudo passwd -l root) \nmake sure you got an account with sudo"
 }
 
 chattr(){
@@ -495,6 +506,7 @@ perms
 fstab
 etcConf
 dconfSettings
+passwordPolicy
 other
 #last thing absolutely last
 chattr
