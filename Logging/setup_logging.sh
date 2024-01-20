@@ -26,7 +26,7 @@ fi
 
 echo "Completes the 'Setup Logging' section of the linux quran"
 
-WAZUH_ADDRESS=$1
+WAZUH_ADDRESS="$1"
 
 #get_install_options() {
     # Instead of the read command, uncomment the below line (and comment the read line) to set the IP without prompting at cli
