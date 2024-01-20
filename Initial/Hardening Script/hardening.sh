@@ -461,6 +461,9 @@ other(){
     fi
 
     systemctl start fail2ban
+
+    echo "$(awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd) those are interactive users with duplicate UIDs, please access /etc/passwd and give each a unique id."
+    
 }
 
 chattr(){
