@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "$EUID" -ne 0 ]; then 
+  echo "Run as sudo"
+  exit
+fi
 
 change_idm_admin(){
     read -s -p "Please enter current password for IDM Domain Admin: " PASS < /dev/tty
