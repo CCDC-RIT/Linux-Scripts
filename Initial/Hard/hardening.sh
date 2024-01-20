@@ -76,7 +76,7 @@ fix_corrupt(){
 
     if [ "$os_type" = "Debian" ]; then
         echo "fixing corrupt packages"
-        apt-fast install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
+        apt install --reinstall $(dpkg -S $(debsums -c) | cut -d : -f 1 | sort -u) -y
         echo "fixing files with missing files"
         xargs -rd '\n' -a <(sudo debsums -c 2>&1 | cut -d " " -f 4 | sort -u | xargs -rd '\n' -- dpkg -S | cut -d : -f 1 | sort -u) -- sudo apt-get install -f --reinstall --
     fi
