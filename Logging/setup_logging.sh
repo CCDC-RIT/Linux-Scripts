@@ -153,6 +153,20 @@ random_old_stuff() {
         #DEBIAN_FRONTEND=noninteractive apt-get install snoopy -y
         #/usr/sbin/snoopy-enable
         #Gotta do snoopy manually
+
+        echo "Installing Argus..."
+        # sudo apt install argus-server
+        sudo apt install argus-client
+
+        # Start Argus as a service ON BOTH SERVER AND CLIENT
+        sudo service argus start
+
+        # Start the Argus sensor as a background daemon on port 561 ON SERVER
+        # argus -n -P 561 -w - | ra -n
+
+        # Read the sensor data on a client periodically (should dedicate a terminal window to this) ON CLIENT
+        # ra -r /var/log/argus/argus.out 
+
         
         echo "Insatlling/Setting up auditd..."
         apt-get install auditd
