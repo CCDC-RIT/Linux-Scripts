@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# by: Justin Huang (jznn) and Hal Williams (hfw8271)
+# by: Hal Williams (hfw8271) and Justin Huang (jznn)
 # Prerequisites: run as root, and users.txt file exists in same dir, can be created using getUsers.sh in setup folder
 
 # check if /etc/redhat-release file exists, indicating a RHEL-based system
